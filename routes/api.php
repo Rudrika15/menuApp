@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\RestaurantController;
 use App\Http\Controllers\API\TableController;
 use App\Http\Controllers\API\StaffController;
+use App\Http\Controllers\API\MenuController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,5 +39,9 @@ Route::middleware('auth.restaurant')->group(function () {
     // staff routes
     Route::get('/staff', [StaffController::class, 'getStaffs']);
     Route::post('/staff', [StaffController::class, 'addStaffs']);
+    
+    // menu api
+    Route::get('/menu', [MenuController::class, 'getStaffs']);
+
 });
 Route::get('/table', [TableController::class, 'getTables']);
