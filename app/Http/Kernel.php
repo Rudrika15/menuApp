@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
 
     protected $routeMiddleware = [
         'auth.restaurant' => \App\Http\Middleware\VerifyRestaurantToken::class,
+        'auth.member' => \App\Http\Middleware\VerifyMemberToken::class,
     ];
 }

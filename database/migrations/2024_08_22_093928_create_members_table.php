@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('staff', function (Blueprint $table) {
+        Schema::create('members', function (Blueprint $table) {
             $table->id();
             $table->integer('restaurantId');
             $table->string('name');
@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('staffType');
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->string('token')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('staff');
+        Schema::dropIfExists('members');
     }
 };
