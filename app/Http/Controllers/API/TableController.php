@@ -14,11 +14,17 @@ class TableController extends Controller
 
     public function getTables(Request $request)
     {
-        $tokenData = $request->header('token');
-        $restaurant = Restaurant::where('token', $tokenData)->first();
-        $restaurantId = $restaurant->id;
+        // $tokenData = $request->header('token');
+        $search = $request->search;
+        // $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = 2;
         try {
-            $tables = Table::where('restaurantId', $restaurantId)->get();
+            $tables = Table::where('restaurantId', $restaurantId);
+            if ($search) {
+                $tables = $tables->where('tableNumber', 'like', '%' . $search . '%');
+            }
+
+            $tables = $tables->get();
             return Util::getResponse($tables);
         } catch (\Throwable $th) {
             Util::getErrorResponse($th);

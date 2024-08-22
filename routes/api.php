@@ -32,10 +32,11 @@ Route::get('/restaurant/{id?}', [RestaurantController::class, 'getRestaurantById
 Route::middleware('auth.restaurant')->group(function () {
 
     //table routes
-    Route::get('/table', [TableController::class, 'getTables']);
+    // Route::get('/table', [TableController::class, 'getTables']);
     Route::post('/table', [TableController::class, 'addTables']);
 
     // staff routes
     Route::get('/staff', [StaffController::class, 'getStaffs']);
     Route::post('/staff', [StaffController::class, 'addStaffs']);
 });
+Route::get('/table', [TableController::class, 'getTables']);
