@@ -37,7 +37,7 @@ class TableController extends Controller
         $search = $request->search;
         $member = Member::where('token', $tokenData)->first();
         $restaurantId = $member->restaurantId;
-        
+
         try {
             $tables = Table::where('restaurantId', $restaurantId);
             if ($search) {
@@ -77,7 +77,45 @@ class TableController extends Controller
 
             return Util::postResponse($table, 'Table added successfully');
         } catch (\Throwable $th) {
-            //throw $th;
+            Util::getErrorResponse($th);
         }
+    }
+
+    public function editTable(Request $request, $id)
+    {
+        try {
+
+            $rules = [
+                'tableNumber' => 'required',
+                'capacity' => 'required|numeric',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return $validator->errors();
+            }
+
+
+            $table = Table::find($id);
+            if (!$table) {
+                return response()->json(['status' => 'failed', 'message' => 'Table not found'], 404);
+            }
+            $table->tableNumber = $request->tableNumber;
+            $table->capacity = $request->capacity;
+            $table->save();
+            return Util::postResponse($table, 'Table updated successfully');
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
+
+    public function deleteTable($id)
+    {
+        $table = Table::find($id);
+        if (!$table) {
+            return response()->json(['status' => 'failed', 'message' => 'Table not found'], 404);
+        }
+        $table->delete();
+        return Util::postResponse($table, 'Table deleted successfully');
     }
 }

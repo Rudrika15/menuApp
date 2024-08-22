@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\MemberController;
 use App\Http\Controllers\API\RestaurantController;
 use App\Http\Controllers\API\TableController;
@@ -41,12 +42,14 @@ Route::middleware('auth.restaurant')->group(function () {
     //table routes
     Route::get('/table', [TableController::class, 'getTables']);
     Route::post('/table', [TableController::class, 'addTables']);
+    Route::put('/table/edit/{id?}', [TableController::class, 'editTable']);
+    Route::delete('/table/delete/{id?}', [TableController::class, 'deleteTable']);
 
     // staff routes
     Route::get('/staff', [MemberController::class, 'getStaffs']);
     Route::post('/staff', [MemberController::class, 'addStaffs']);
-    
-    // menu api
- 
 
+    // Category api
+    Route::get('/categories', [CategoryController::class, 'getCategories']);
+    Route::post('/categories', [CategoryController::class, 'addCategories']);
 });
