@@ -19,7 +19,7 @@ class Util
 
         return response()->json(
             [
-                'status' => 200,
+                'status' => true,
                 'message' => 'Success',
                 'data' => $data,
                 'token' => $token
@@ -55,7 +55,7 @@ class Util
     public static function authenticate()
     {
         return response()->json(['status' => 'failed', 'message' => 'Unauthenticated'], 401);
-    } 
+    }
 
 
 
@@ -63,7 +63,7 @@ class Util
     public static function getResponse($data)
     {
         return response()->json([
-            'status' => 200,
+            'status' => true,
             'message' => 'Success',
             'data' => $data
         ], 200);
@@ -72,7 +72,7 @@ class Util
     public static function postResponse($data, $imageUrl = null)
     {
         return response()->json([
-            'status' => 201,
+            'status' => true,
             'message' => 'Success',
             'imageUrl' => $imageUrl,
             'data' => $data
@@ -82,7 +82,7 @@ class Util
     public static function getErrorResponse($message)
     {
         return response()->json([
-            'status' => 400,
+            'status' => false,
             'message' => $message
         ], 400);
     }
