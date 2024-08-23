@@ -37,7 +37,7 @@ class Util
 
         // Check if the token is provided
         if (!$token) {
-            return response()->json(['status' => 'failed', 'message' => 'Token not provided'], 401);
+            return response()->json(['status' => false, 'message' => 'Token not provided'], 401);
         }
 
         // Find the restaurant with the matching token
@@ -45,7 +45,7 @@ class Util
 
         // If no restaurant is found with the provided token, return false
         if (!$restaurant) {
-            return response()->json(['status' => 'failed', 'message' => 'Invalid token'], 401);
+            return response()->json(['status' => false, 'message' => 'Invalid token'], 401);
         }
 
         // Return the restaurant instance if found
@@ -54,7 +54,7 @@ class Util
 
     public static function authenticate()
     {
-        return response()->json(['status' => 'failed', 'message' => 'Unauthenticated'], 401);
+        return response()->json(['status' => false, 'message' => 'Unauthenticated'], 401);
     }
 
 
