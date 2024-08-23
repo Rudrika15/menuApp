@@ -19,13 +19,13 @@ class VerifyRestaurantToken
         $token = $request->header('token');
 
         if (!$token) {
-            return response()->json(['status' => 'failed', 'message' => 'Token not provided'], 401);
+            return response()->json(['status' => false, 'message' => 'Token not provided'], 200);
         }
 
         $restaurant = Restaurant::where('token', $token)->first();
 
         if (!$restaurant) {
-            return response()->json(['status' => 'failed', 'message' => 'Invalid token'], 401);
+            return response()->json(['status' => false, 'message' => 'Invalid token'], 200);
         }
         $request->attributes->set('restaurant', $restaurant);
 
