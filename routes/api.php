@@ -52,4 +52,10 @@ Route::middleware('auth.restaurant')->group(function () {
     // Category api
     Route::get('/categories', [CategoryController::class, 'getCategories']);
     Route::post('/categories', [CategoryController::class, 'addCategories']);
+
+    // menu api
+    Route::get('/menu', [MenuController::class, 'getMenus']);
+    // Route::post('/menu', [MenuController::class, 'addMenu']);
+    // Route::put('/menu/edit/{id?}', [MenuController::class, 'editMenu']);
+    // Route::delete('/menu/delete/{id?}', [MenuController::class, 'deleteMenu']);
 });

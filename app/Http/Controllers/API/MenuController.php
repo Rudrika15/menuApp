@@ -12,10 +12,6 @@ use Illuminate\Http\Request;
 class MenuController extends Controller
 {
 
-    public function __construct()
-    {
-        // 
-    }
 
     public function menuList(Request $request)
     {
@@ -25,10 +21,21 @@ class MenuController extends Controller
         $restaurantId = $member->restaurantId;
 
         $menu = Menu::where('restaurantId', $restaurantId);
-        if($request->search) {
-            $menu = $menu->where('title', 'like', '%'.$request->search.'%');
+        if ($request->search) {
+            $menu = $menu->where('title', 'like', '%' . $request->search . '%');
         }
         $menu = $menu->get();
         return Util::getResponse($menu);
     }
+
+    public function getMenus(Request $request)
+    {
+        $menu = Menu::where('restaurantId', $request->restaurantId);
+        if ($request->search) {
+            $menu = $menu->where('title', 'like', '%' . $request->search . '%');
+        }
+        $menu = $menu->get();
+        return Util::getResponse($menu);
+    }
+    
 }
