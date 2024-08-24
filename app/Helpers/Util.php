@@ -19,7 +19,7 @@ class Util
 
         return response()->json(
             [
-                'status' => 200,
+                'status' => true,
                 'message' => 'Success',
                 'data' => $data,
                 'token' => $token
@@ -37,7 +37,7 @@ class Util
 
         // Check if the token is provided
         if (!$token) {
-            return response()->json(['status' => 'failed', 'message' => 'Token not provided'], 401);
+            return response()->json(['status' => false, 'message' => 'Token not provided'], 200);
         }
 
         // Find the restaurant with the matching token
@@ -45,7 +45,7 @@ class Util
 
         // If no restaurant is found with the provided token, return false
         if (!$restaurant) {
-            return response()->json(['status' => 'failed', 'message' => 'Invalid token'], 401);
+            return response()->json(['status' => false, 'message' => 'Invalid token'], 200);
         }
 
         // Return the restaurant instance if found
@@ -54,8 +54,8 @@ class Util
 
     public static function authenticate()
     {
-        return response()->json(['status' => 'failed', 'message' => 'Unauthenticated'], 401);
-    } 
+        return response()->json(['status' => false, 'message' => 'Unauthenticated'], 200);
+    }
 
 
 
@@ -63,7 +63,7 @@ class Util
     public static function getResponse($data)
     {
         return response()->json([
-            'status' => 200,
+            'status' => true,
             'message' => 'Success',
             'data' => $data
         ], 200);
@@ -72,7 +72,7 @@ class Util
     public static function postResponse($data, $imageUrl = null)
     {
         return response()->json([
-            'status' => 201,
+            'status' => true,
             'message' => 'Success',
             'imageUrl' => $imageUrl,
             'data' => $data
@@ -82,8 +82,8 @@ class Util
     public static function getErrorResponse($message)
     {
         return response()->json([
-            'status' => 400,
+            'status' => false,
             'message' => $message
-        ], 400);
+        ], 200);
     }
 }

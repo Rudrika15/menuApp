@@ -1,65 +1,54 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
-use App\Models\API\Category;
+use App\Helpers\Util;
+use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function getCategories(Request $request)
     {
-        //
+        try {
+            $tokenData = $request->header('token');
+            $restaurant = Restaurant::where('token', $tokenData)->first();
+            $restaurantId = $restaurant->id;
+            $categories = Category::where('restaurantId', $restaurantId)->get();
+            return Util::getResponse($categories);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function addCategories(Request $request)
     {
-        //
-    }
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+        $rules = [
+            'title' => 'required',
+            'photo' => 'required',
+        ];
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return $validator->errors();
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
-    {
-        //
+        try {
+            $category = new Category();
+            $category->title = $request->title;
+            $category->photo = time() . '.' . $request->photo->extension();
+            $request->photo->move(public_path('categoryPhoto'), $category->photo);
+            $category->restaurantId = $restaurantId;
+            $category->save();
+            return Util::postResponse($category, "categoryPhoto/" . $category->photo);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
     }
 }
