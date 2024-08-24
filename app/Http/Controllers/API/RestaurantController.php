@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\Util;
 use App\Http\Controllers\Controller;
+use App\Models\Member;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -81,7 +82,6 @@ class RestaurantController extends Controller
             $restaurant = new Restaurant();
             $restaurant->name = $request->name;
             $restaurant->email = $request->email;
-            $restaurant->password = bcrypt($request->password);
             $restaurant->gstNumber = $request->gstNumber;
             $restaurant->upi = $request->upi;
             $restaurant->logo = \time() . '.' . $request->logo->extension();
@@ -89,9 +89,19 @@ class RestaurantController extends Controller
             $restaurant->color1 = $request->color1;
             $restaurant->color2 = $request->color2;
             $restaurant->address = $request->address;
-            $restaurant->token = Util::generateToken();
             $restaurant->status = 'Active';
             $restaurant->save();
+
+
+            $member  = new Member();
+            $member->restaurantId = $restaurant->id;
+            $member->name = $request->name;
+            $member->password = Hash::make($request->password);
+            $member->contactNumber = $request->contactNumber;
+            $member->email = $request->email;
+            $member->token = Util::generateToken();
+            $member->staffType = 'Admin';
+            $member->save();
 
 
             return Util::postResponse($restaurant, "restaurantLogo/" . $restaurant->logo);
