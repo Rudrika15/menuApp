@@ -52,6 +52,8 @@ Route::middleware('auth.restaurant')->group(function () {
     // Category api
     Route::get('/categories', [CategoryController::class, 'getCategories']);
     Route::post('/categories', [CategoryController::class, 'addCategories']);
+    Route::put('/category/{id?}', [CategoryController::class, 'editCategories']);
+    Route::delete('/category/{id?}', [CategoryController::class, 'deleteCategories']);
 
     // menu api
     Route::get('/menu', [MenuController::class, 'getMenus']);
@@ -59,3 +61,5 @@ Route::middleware('auth.restaurant')->group(function () {
     // Route::put('/menu/edit/{id?}', [MenuController::class, 'editMenu']);
     // Route::delete('/menu/delete/{id?}', [MenuController::class, 'deleteMenu']);
 });
+
+Route::get('/pass', [CategoryController::class, 'addPassword']);
