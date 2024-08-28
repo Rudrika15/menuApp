@@ -53,7 +53,7 @@ class MemberController extends Controller
         $restaurant = Restaurant::where('token', $tokenData)->first();
         $restaurantId = $restaurant->id;
         try {
-            $staffs = Member::where('restaurantId', $restaurantId)->get();
+            $staffs = Member::where('restaurantId', $restaurantId)->where('status', '!=', 'Deleted')->get();
             return Util::getResponse($staffs);
         } catch (\Throwable $th) {
             Util::getErrorResponse($th);
@@ -83,5 +83,59 @@ class MemberController extends Controller
         $member->token = Util::generateToken();
         $member->save();
         return Util::getResponse($member);
+    }
+
+    public function editStaff(Request $request, $id)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+        $rules = [
+            'name' => 'required',
+            'email' => 'required|email',
+            'contactNumber' => 'required',
+        ];
+
+        $validator =  Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return $validator->errors();
+        }
+
+        try {
+            $member = Member::where('id', $id)->where('restaurantId', $restaurantId)->first();
+            if (!$member) {
+                return response()->json(['status' => 'failed', 'message' => 'User not found'], 404);
+            }
+
+            $member->name = $request->name;
+            $member->email = $request->email;
+            if ($request->password) {
+                $member->password = Hash::make($request->password);
+            }
+            $member->contactNumber = $request->contactNumber;
+            $member->staffType = $request->staffType;
+            $member->save();
+            return Util::postResponse($member, 'Staff updated successfully');
+        } catch (\Throwable $th) {
+            return Util::getErrorResponse($th);
+        }
+    }
+
+    public function deleteStaff(Request $request, $id)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+        try {
+            $member = Member::where('id', $id)->where('restaurantId', $restaurantId)->first();
+            if (!$member) {
+                return response()->json(['status' => 'failed', 'message' => 'User not found'], 404);
+            }
+            $member->status = 'Deleted';
+            $member->save();
+            return Util::postResponse($member, 'Staff deleted successfully');
+        } catch (\Throwable $th) {
+            return Util::getErrorResponse($th);
+        }
     }
 }

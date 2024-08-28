@@ -44,7 +44,7 @@ class TableController extends Controller
                 $tables = $tables->where('tableNumber', 'like', '%' . $search . '%');
             }
 
-            $tables = $tables->get();
+            $tables = $tables->where('status', '!=', 'Deleted')->get();
             return Util::getResponse($tables);
         } catch (\Throwable $th) {
             Util::getErrorResponse($th);
@@ -115,7 +115,8 @@ class TableController extends Controller
         if (!$table) {
             return response()->json(['status' => 'failed', 'message' => 'Table not found'], 404);
         }
-        $table->delete();
+        $table->status = 'Deleted';
+        $table->save();
         return Util::postResponse($table, 'Table deleted successfully');
     }
 }

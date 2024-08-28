@@ -25,7 +25,7 @@ class MenuController extends Controller
         if ($request->search) {
             $menu = $menu->where('title', 'like', '%' . $request->search . '%');
         }
-        $menu = $menu->get();
+        $menu = $menu->where('status', '!=', 'Deleted')->get();
         return Util::getResponse($menu);
     }
 

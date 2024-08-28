@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('restaurantId');
             $table->string('title');
             $table->string('photo')->nullable();
-            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->enum('status', ['Active', 'Inactive', 'Deleted'])->default('Active');
             $table->timestamps();
         });
     }

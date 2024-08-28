@@ -18,7 +18,7 @@ class CategoryController extends Controller
             $tokenData = $request->header('token');
             $restaurant = Restaurant::where('token', $tokenData)->first();
             $restaurantId = $restaurant->id;
-            $categories = Category::where('restaurantId', $restaurantId)->get();
+            $categories = Category::where('restaurantId', $restaurantId)->where('status', '!=', 'Deleted')->get();
             return Util::getResponse($categories);
         } catch (\Throwable $th) {
             Util::getErrorResponse($th);

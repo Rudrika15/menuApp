@@ -48,6 +48,8 @@ Route::middleware('auth.restaurant')->group(function () {
     // staff routes
     Route::get('/staff', [MemberController::class, 'getStaffs']);
     Route::post('/staff', [MemberController::class, 'addStaffs']);
+    Route::put('/staff/{id?}', [MemberController::class, 'editStaff']);
+    Route::delete('/staff/{id?}', [MemberController::class, 'deleteStaff']);
 
     // Category api
     Route::get('/categories', [CategoryController::class, 'getCategories']);
