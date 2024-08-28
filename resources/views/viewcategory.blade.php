@@ -4,15 +4,15 @@
 <a href="{{route('category.index')}}" class="btn btn-sm btn-primary mb-3" ><i class="fa fa-arrow-left"></i> Back </a>
 <table class="table table-bordered text-center">
     <tr>
-        <th>Restaurant Name</th>
+        {{-- <th>Restaurant Name</th> --}}
         <th>Title</th>
         <th>Photo</th>
         <th>Status</th>
     </tr>
 <tr>
-    <td>
+    {{-- <td>
         {{$category->restaurant->name}}
-    </td>
+    </td> --}}
     <td>
         {{$category->title}}
     </td>

@@ -25,6 +25,7 @@
     <thead>
         <tr>
             <th>No</th>
+            <th>Category Name</th>
             <th>Title</th>
             <th>Price</th>
             <th>Photo</th>
@@ -39,6 +40,7 @@
         @foreach ($menu as $item)
         <tr>
             <td>{{ ++$i }}</td>
+            <td>{{ $item->category ? $item->category->title : 'No Category'}}</td>
             <td>{{ $item->title }}</td>
             <td>{{ number_format($item->price,2) }}</td>
             <td><img src="menuImage/{{ $item->photo }}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;"></td>
@@ -88,8 +90,10 @@
                             var showUrl = menuShowUrl.replace(':id', menus[i].id);
                             var editUrl = menuEditUrl.replace(':id', menus[i].id);
                             var deleteUrl = menuDeleteUrl.replace(':id', menus[i].id);
+                            var categoryTitle = menus[i].category ? menus[i].category.title : 'No Category';
                             html += `<tr>
                                     <td>${i+1}</td>
+                                    <td>${categoryTitle}</td>
                                     <td>${menus[i].title}</td>
                                     <td>${menus[i].price}</td>
                                     <td><img src="menuImage/${menus[i].photo}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;"></td>

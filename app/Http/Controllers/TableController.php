@@ -36,16 +36,15 @@ class TableController extends Controller
     public function store(Request $request)
     {
         try{ $validatedData = $request->validate([
-                'restaurantid' => 'required',
                 'tableNumber' => 'required|numeric',
                 'capacity' => 'required|numeric',
             ]);
-
+            $restaurantId = Session::get('id');
             $data = new Table();
-            $data->restaurantid = $request->restaurantid;
+            $data->restaurantid = $restaurantId;
             $data->tableNumber = $request->tableNumber;
             $data->capacity = $request->capacity;
-            $data->status = $request->status;
+            // $data->status = $request->status;
             $data->save();
 
             return response()->json([
@@ -60,6 +59,49 @@ class TableController extends Controller
             ]);
         }
 
+    }
+
+    public function trashtable(){
+
+        $restaurantId = Session::get('id');
+        $table = Table::where('restaurantId', $restaurantId)
+            ->onlyTrashed()
+            ->where('status', 'Inactive')
+            ->paginate(5);
+    
+        return view('tables.trashtable', compact('table'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
+
+    }
+    public function restore(string $id){
+        $table = Table::onlyTrashed()->find($id);
+
+        if ($table) {
+            $table->restore();
+
+            $table->status = "Active";
+            $table->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Table restored successfully!',
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Table not found or already restored.',
+            ]);
+        }
+    }
+
+    public function forcedelete(string $id){
+        $table = Table::withTrashed()->findOrFail($id);
+        $table->forceDelete();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Table permanently deleted!',
+        ]);
     }
 
     /**
@@ -93,7 +135,7 @@ class TableController extends Controller
             $data = Table::find($id);
             $data->tableNumber = $request->tableNumber;
             $data->capacity = $request->capacity;
-            $data->status = $request->status;
+            // $data->status = $request->status;
             $data->save();
 
             return response()->json([
@@ -116,6 +158,8 @@ class TableController extends Controller
     public function destroy(string $id)
     {
         $data = Table::find($id);
+        $data->status = "Inactive";
+        $data->save();
         $data->delete();
         return response()->json([
             'status' => 'success',

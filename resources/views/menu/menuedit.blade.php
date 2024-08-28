@@ -13,16 +13,19 @@
     <div id="categoty-container">
         <div class="category-form mb-5">
             <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mb-2">
+                {{-- <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mb-2">
                     <strong>Restaurant:</strong>
                     <select name="restaurantid" class="form-control form-select" id="restaurantid">
                         <option value="{{ $menu->restaurant->id }}" selected>{{ $menu->restaurant->name }}</option>
                     </select>
-                </div>
+                </div> --}}
                 <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mb-2">
                     <strong>Category:</strong>
-                    <select name="categoryname" class="form-control form-select" id="categoryname">
-                        <option value="{{ $menu->category->title }}" selected>{{ $menu->category->title }}</option>
+                    <select name="categoryid" class="form-control form-select" id="categoryid">
+                        <option value="">Select Category</option>
+                        @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" {{ $menu->categoryId == $category->id ? 'selected' : '' }}>  {{ $category->title }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -51,14 +54,14 @@
                         <input type="file"  style="padding: 9px 10px 4px" onchange="document.getElementById('output').src = window.URL.createObjectURL(this.files[0])" name="photo" id="photo" class="form-contol" accept="image/*">
                     </div>
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-12">
+                {{-- <div class="col-xs-12 col-sm-12 col-md-12">
                     <strong>Status:</strong>
                     <select name="status" class="form-control status" id="status">
                         <option value="Active" {{ $menu->status=='Active' ? 'selected' : '' }}>Active</option>
                         <option value="Inactive" {{ $menu->status=='Inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
-
+ --}}
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
             <button type="submit" class="btn btn-primary btn-sm mb-3 mt-2"><i class="fa fa-save"></i> Submit</button>
@@ -84,6 +87,7 @@
                 success: function (response){
                     if(response.status){
                         toastr.success(response.message);
+                        $('button[type="submit"]').text('Submitted').prop('disabled',true);
                         setTimeout(function() {
                             window.location.href = "{{ route('menu.index') }}";
                         }, 2000);

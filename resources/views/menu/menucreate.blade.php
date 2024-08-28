@@ -13,12 +13,12 @@
     <div id="categoty-container">
         <div class="category-form mb-5">
             <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mb-2">
+                {{-- <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mb-2">
                     <strong>Restaurant:</strong>
                     <select name="restaurantid" class="form-control form-select" id="restaurantid">
                         <option value="{{ $restaurant->id }}" selected>{{ $restaurant->name }}</option>
                     </select>
-                </div>
+                </div> --}}
                 <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mb-2">
                     <strong>Category:</strong>
                     <select name="categoryid" class="form-control form-select" id="categoryid">
@@ -46,17 +46,18 @@
                 <div class="col-xs-12 col-sm-12 col-md-12">
                     <div class="form-group">
                         <strong>Image:</strong>
+                        <img id="imagePreview" src="#" alt="Image Preview" style="display:none; margin-bottom:5px;  width: 100px; height: 100px; object-fit: cover; border-radius: 5px;"/>
                         <input type="file" class="form-control " style="padding: 12px 18px 36px" id="photo"
-                        name="photo" accept="image/*">
+                        name="photo" accept="image/*" onchange="previewImage(event)">
                     </div>
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-12">
+                {{-- <div class="col-xs-12 col-sm-12 col-md-12">
                     <strong>Status:</strong>
                     <select name="status" class="form-control status" id="status">
                         <option value="Active" >Active</option>
                         <option value="Inactive">Inactive</option>
                     </select>
-                </div>
+                </div> --}}
 
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
@@ -84,6 +85,7 @@
                 success: function (response){
                     if(response.status){
                         toastr.success(response.message);
+                        $('button[type="submit"]').text('Submitted').prop('disabled', true);
                         setTimeout(function() {
                             window.location.href = "{{ route('menu.index') }}";
                         }, 2000);   
@@ -105,5 +107,15 @@
             });
         });
     });
+    function previewImage(event) {
+    var reader = new FileReader();
+    reader.onload = function(){
+        var output = document.getElementById('imagePreview');
+        output.src = reader.result;
+        output.style.display = 'block'; 
+    }
+    reader.readAsDataURL(event.target.files[0]);
+}
+
 </script>
 @endsection

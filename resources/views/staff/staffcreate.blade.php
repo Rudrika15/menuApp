@@ -11,13 +11,13 @@
     <div id="categoty-container">
         <div class="category-form mb-5">
             <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mb-2">
+                {{-- <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mb-2">
                     <strong>Restaurant:</strong>
                     <select name="restaurantid" class="form-control form-select" id="restaurantid">
                         <option value="{{ $restaurant->id }}" selected>{{ $restaurant->name }}</option>
                     </select>
                 </div>
-
+ --}}
                 <div class="col-xs-12 col-sm-12 col-md-12">
                     <div class="form-group">
                         <strong>Name:</strong>
@@ -54,13 +54,13 @@
                     </div>
                 </div>                
                 
-                <div class="col-xs-12 col-sm-12 col-md-12">
+                {{-- <div class="col-xs-12 col-sm-12 col-md-12">
                     <strong>Status:</strong>
                     <select name="status" class="form-control status" id="status">
                         <option value="Active" >Active</option>
                         <option value="Inactive" >Inactive</option>
                     </select>
-                </div>
+                </div> --}}
 
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
@@ -88,6 +88,7 @@
                 success: function (response){
                     if(response.status){
                         toastr.success(response.message);
+                        $('button[type="submit"]').text('Submitted').prop('disabled',true);
                         setTimeout(function() {
                             window.location.href = "{{ route('staff.index') }}";
                         }, 2000);  

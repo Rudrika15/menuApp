@@ -16,11 +16,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $restaurantId = Session::get('id');   
-        $category = Category::where('restaurantId',$restaurantId)->paginate(5);
-        return view('catagories',compact('category'))
-        ->with('i', (request()->input('page', 1) - 1) * 5);
-        
+        $restaurantId = Session::get('id');
+        $category = Category::where('restaurantId', $restaurantId)->paginate(5);
+        return view('catagories', compact('category'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
     /**
@@ -30,7 +29,7 @@ class CategoryController extends Controller
     {
         $restaurantId = Session::get('id');
         $restaurant = Restaurant::find($restaurantId);
-        return view('createcategories',compact('restaurant','restaurantId'));
+        return view('createcategories', compact('restaurant', 'restaurantId'));
     }
 
     /**
@@ -38,19 +37,18 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-      try{ $validatedData = $request->validate([
-            'restaurantid' => 'required',
-            'title' => 'required',
+        try {
+            $validatedData = $request->validate([
+                'title' => 'required',
             ]);
-
+            $restaurantId = Session::get('id');
             $data = new Category();
-            $data->restaurantid = $request->restaurantid;
+            $data->restaurantid = $restaurantId;
             $data->title = $request->title;
-            $data->status = $request->status;
-            if($image = $request->file('photo')){
+            if ($image = $request->file('photo')) {
                 $path = 'categoryImage/';
-                $imagename = time(). "." . $image->getClientOriginalExtension();
-                $image->move($path,$imagename);
+                $imagename = time() . "." . $image->getClientOriginalExtension();
+                $image->move($path, $imagename);
                 $data->photo = $imagename;
             }
             $data->save();
@@ -60,22 +58,84 @@ class CategoryController extends Controller
                 'message' => 'Category Successfully Saved!...',
                 'data' => $data,
             ]);
-        }catch(\Illuminate\Validation\ValidationException $e){
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'status' => false,
                 'errors' => $e->errors(),
             ]);
         }
-
     }
 
-    /**
-     * Display the specified resource.
-     */
+    public function trashcategory()
+    {
+        $restaurantId = Session::get('id');
+        $category = Category::where('restaurantId', $restaurantId)->where('status', 'Inactive')->onlyTrashed()->paginate(5);
+        return view('trashcategories', compact('category'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
+    }
+
+    public function restore(string $id)
+    {
+        $category = Category::onlyTrashed()->with('menu')->find($id);
+
+        if ($category) {
+            $category->restore();
+
+            $category->status = "Active";
+            $category->save();
+
+            $menus = $category->menu()->onlyTrashed()->get();
+            foreach ($menus as $menu) {
+                $menu->restore();
+                $menu->status = "Active";
+                $menu->save();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Category and its menus restored successfully!',
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Category not found or already restored.',
+            ]);
+        }
+    }
+
+    public function forcedelete(string $id)
+    {
+        $category = Category::withTrashed()->findOrFail($id);
+    
+        if ($category) {
+            if(!empty($category->photo))
+            {
+                $imagepath = public_path('categoryImage/'.$category->photo);
+                if(file_exists($imagepath)){
+                    unlink($imagepath);
+                }
+            }
+
+            $category->menu()->forceDelete();
+    
+            $category->forceDelete();
+    
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Category and its menus permanently deleted!',
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Category not found!',
+            ]);
+        }
+    }
+    
     public function show(string $id)
     {
         $category = Category::all()->find($id);
-        return view('viewcategory',compact('category'));
+        return view('viewcategory', compact('category'));
     }
 
     /**
@@ -84,7 +144,7 @@ class CategoryController extends Controller
     public function edit(string $id)
     {
         $category = Category::with('restaurant')->find($id);
-        return view('categoryedit',compact('category'));
+        return view('categoryedit', compact('category'));
     }
 
     /**
@@ -92,8 +152,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        try{ $validatedData = $request->validate([
-            "title" => 'required',
+        try {
+            $validatedData = $request->validate([
+                "title" => 'required',
             ]);
 
             $data  = Category::find($id);
@@ -104,7 +165,7 @@ class CategoryController extends Controller
                 $imageName = time() . "." . $image->getClientOriginalExtension();
                 $image->move($path, $imageName);
 
-                if($data->photo){
+                if ($data->photo) {
                     $oldimagepath = public_path('categoryImage/' . $data->photo);
                     if (file_exists($oldimagepath)) {
                         unlink($oldimagepath);
@@ -113,15 +174,15 @@ class CategoryController extends Controller
 
                 $data->photo = $imageName;
             }
-           
-            $data->status = $request->status;
+
+            // $data->status = $request->status;
             $data->save();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Data Updated successfully!',
                 'data' => $data,
             ]);
-        }catch(\Illuminate\Validation\ValidationException $e){
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'status' => false,
                 'errors' => $e->errors(),
@@ -135,15 +196,22 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $data = Category::find($id);
-        if($data)
-        {
-            if(!empty($data->photo))
-            {
-                $imagepath = public_path('categoryImage/'.$data->photo);
-                if(file_exists($imagepath)){
-                    unlink($imagepath);
-                }
-            }
+        // if($data)
+        // {
+        //     if(!empty($data->photo))
+        //     {
+        //         $imagepath = public_path('categoryImage/'.$data->photo);
+        //         if(file_exists($imagepath)){
+        //             unlink($imagepath);
+        //         }
+        //     }
+        // }
+        $data->status = "Inactive";
+        $data->save();
+        $menus = $data->menu;
+        foreach ($menus as $menu) {
+            $menu->status = "Inactive";
+            $menu->save();
         }
         $data->menu()->delete();
         $data->delete();
@@ -153,5 +221,4 @@ class CategoryController extends Controller
             'data' => $data,
         ]);
     }
-
 }

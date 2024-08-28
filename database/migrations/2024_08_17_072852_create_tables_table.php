@@ -16,8 +16,9 @@ return new class extends Migration
             $table->integer('restaurantId');
             $table->string('tableNumber');
             $table->string('capacity');
-            $table->enum('status', ['Booked', 'Occupied', 'Available'])->default('Available');
+            $table->enum('status', ['Booked', 'Occupied', 'Available','Active','Inactive'])->default('Active');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

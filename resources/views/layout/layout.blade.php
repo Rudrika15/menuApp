@@ -10,7 +10,6 @@
     <meta name="author" content="">
 
     <title>menuApp - Dashboard</title>
-
     <!-- Custom fonts for this template-->
     <link href="{{asset('vendor/fontawesome-free/css/all.min.css')}}" rel="stylesheet" type="text/css">
     <link
@@ -64,34 +63,77 @@
 
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                    aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Categories</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Custom Pages:</h6>
+                        <a class="collapse-item" href="{{route('category.create')}}">Create New Categories</a>
+                        <a class="collapse-item" href="{{route('category.index')}}">View Categories</a>
+                        <a class="collapse-item" href="{{route('trashcategory.view')}}">Trash Delete</a>
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
                     aria-expanded="true" aria-controls="collapseUtilities">
                     <i class="fas fa-fw fa-folder"></i>
-                    <span>Pages</span>
+                    <span>Menus</span>
                 </a>
                 <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Custom Pages:</h6>
-                        <a class="collapse-item" href="{{route('category.index')}}">Categories</a>
-                        <a class="collapse-item" href="{{route('menu.index')}}">Menus</a>
-                        <a class="collapse-item" href="{{route('staff.index')}}">Staff</a>
-                        <a class="collapse-item" href="{{route('table.index')}}">Tables</a>
+                        <a class="collapse-item" href="{{route('menu.create')}}">Create New Menu</a>
+                        <a class="collapse-item" href="{{route('menu.index')}}">View</a>
+                        <a class="collapse-item" href="{{route('trashmenu.view')}}">Trash Delete</a>
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
+                    aria-expanded="true" aria-controls="collapsePages">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Staff</span>
+                </a>
+                <div id="collapsePages" class="collapse" aria-labelledby="headingPages"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Custom Pages:</h6>
+                        <a class="collapse-item" href="{{route('staff.create')}}">Create New Staff</a>
+                        <a class="collapse-item" href="{{route('staff.index')}}">View</a>
+                        <a class="collapse-item" href="{{route('trashstaff.view')}}">Trash Delete</a>
                     </div>
                 </div>
             </li>
 
 
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable"
+                    aria-expanded="true" aria-controls="collapseTable">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Table</span>
+                </a>
+                <div id="collapseTable" class="collapse" aria-labelledby="headingTable"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Custom Pages:</h6>
+                        <a class="collapse-item" href="{{route('table.create')}}">Create New Table</a>
+                        <a class="collapse-item" href="{{route('table.index')}}">View</a>
+                        <a class="collapse-item" href="{{route('trashtable.view')}}">Trash Delete</a>
+                    </div>
+                </div>
+            </li>
+
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
-
-            <!-- Sidebar Message -->
-            <div class="sidebar-card d-none d-lg-flex">
-                <img class="sidebar-card-illustration mb-2" src="img/undraw_rocket.svg" alt="...">
-                <p class="text-center mb-2"><strong>SB Admin Pro</strong> is packed with premium features, components, and more!</p>
-                <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">Upgrade to Pro!</a>
             </div>
 
         </ul>

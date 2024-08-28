@@ -18,7 +18,7 @@ class MenuController extends Controller
     {
         $restaurantId = Session::get('id');   
         $categories = Category::where('restaurantId',$restaurantId)->get();
-        $menurestaurant = Menu::where('restaurantId',$restaurantId);
+        $menurestaurant = Menu::with('category')->where('restaurantId',$restaurantId);
         
         if ($request->has('categoryId') && $request->categoryId != '') {
             $menurestaurant->where('categoryId', $request->categoryId);
@@ -55,18 +55,18 @@ class MenuController extends Controller
     {
                 
         try{ $validatedData = $request->validate([
-            'restaurantid' => 'required',
+            // 'restaurantid' => 'required',
             'categoryid' => 'required',
             'title' => 'required',
             'price'=>  'required|numeric',
             ]);
-        
+            $restaurantId = Session::get('id');   
             $data = new Menu();
-            $data->restaurantid = $request->restaurantid;
+            $data->restaurantid = $restaurantId;
             $data->categoryid = $request->categoryid;
             $data->title = $request->title;
             $data->price = $request->price;
-            $data->status = $request->status;
+            // $data->status = $request->status;
             
             if($image = $request->file('photo')){
                 $path = 'menuImage/';
@@ -89,8 +89,75 @@ class MenuController extends Controller
         }
         
     }
+    public function trashmenu()
+    {
+        $restaurantId = Session::get('id');
+        $menu = Menu::with('category')
+            ->where('restaurantId', $restaurantId)
+            ->onlyTrashed()
+            ->where('status', 'Inactive')
+            ->paginate(5);
+            
+        return view('menu.trashmenu', compact('menu'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
+    }
 
-    /**
+    public function restore(string $id){
+
+        $menu = Menu::onlyTrashed()->find($id);
+
+        if ($menu) {
+            $menu->restore();
+
+            $menu->status = "Active";
+            $menu->save();
+
+            $menus = $menu->onlyTrashed()->get();
+            foreach ($menus as $menu) {
+                $menu->restore();
+                $menu->status = "Active";
+                $menu->save();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Menus restored successfully!',
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Menu not found or already restored.',
+            ]);
+        }
+    }
+
+    public function forcedelete(string $id){
+        $menu = Menu::withTrashed()->findOrFail($id);
+    
+        if ($menu) {
+            if(!empty($menu->photo))
+            {
+                $imagepath = public_path('menuImage/'.$menu->photo);
+                if(file_exists($imagepath)){
+                    unlink($imagepath);
+                }
+            }
+
+            $menu->forceDelete();
+        
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Menus permanently deleted!',
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Menu not found!',
+            ]);
+        }
+
+    }
+        /**
      * Display the specified resource.
      */
     public function show(string $id)
@@ -105,7 +172,9 @@ class MenuController extends Controller
     public function edit(string $id)
     {
         $menu = Menu::find($id);
-        return view('menu.menuedit',compact('menu'));
+        $restaurant = $menu->restaurant;
+        $categories = $restaurant ? $restaurant->category : [];
+        return view('menu.menuedit',compact('menu','categories'));
 
     }
 
@@ -114,6 +183,7 @@ class MenuController extends Controller
      */
     public function update(Request $request, string $id)
     {
+    
         try{ $validatedData = $request->validate([
             "title" => 'required',
             "price"=>  'required|numeric',
@@ -122,6 +192,7 @@ class MenuController extends Controller
             $data  = Menu::find($id);
             $data->title = $request->title;
             $data->price = $request->price;
+            $data->categoryid = $request->categoryid;
             if ($request->hasFile('photo')) {
                 $image = $request->file('photo');
                 $path = 'menuImage/';
@@ -137,7 +208,7 @@ class MenuController extends Controller
                 
                 $data->photo = $imageName;
             }
-            $data->status = $request->status;
+            // $data->status = $request->status;
             $data->save();
             return response()->json([
                 'status' => 'success',
@@ -159,16 +230,18 @@ class MenuController extends Controller
     public function destroy(string $id)
     {
         $data = Menu::find($id);
-        if($data)
-        {
-            if(!empty($data->photo))
-            {
-                $imagepath = public_path('menuImage/'.$data->photo);
-                if(file_exists($imagepath)){
-                    unlink($imagepath);
-                }
-            }
-        }
+        $data->status = "Inactive";
+        $data->save();
+        // if($data)
+        // {
+        //     if(!empty($data->photo))
+        //     {
+        //         $imagepath = public_path('menuImage/'.$data->photo);
+        //         if(file_exists($imagepath)){
+        //             unlink($imagepath);
+        //         }
+        //     }
+        // }
         $data->delete();
         return response()->json([
             'status' => 'success',

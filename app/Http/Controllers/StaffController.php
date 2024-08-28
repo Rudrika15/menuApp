@@ -39,22 +39,21 @@ class StaffController extends Controller
     public function store(Request $request)
     {
         try{ $validatedData = $request->validate([
-                'restaurantid' => 'required',
                 'name' => 'required',
                 'contactNumber' => 'required|digits:10|numeric|regex:/^[6-9]\d{9}$/',
                 'email' => 'required|email|unique:staff,email',
                 'password' => 'required|min:6',
                 'staffType' => 'required',
             ]);
-        
+            $restaurantId = Session::get('id');
             $data = new Staff();
-            $data->restaurantid = $request->restaurantid;
+            $data->restaurantid = $restaurantId;
             $data->name = $request->name;
             $data->contactNumber = $request->contactNumber;
             $data->email = $request->email;
             $data->password = bcrypt($request->password);
             $data->staffType = $request->staffType;
-            $data->status = $request->status;
+            // $data->status = $request->status;
             $data->save();
         
             return response()->json([
@@ -68,6 +67,47 @@ class StaffController extends Controller
                 'errors' => $e->errors(),
             ]);
         }   
+    }
+
+    public function trashstaff()
+    {
+        $restaurantId = Session::get('id');
+        $staff = Staff::where('restaurantId', $restaurantId)
+            ->onlyTrashed()
+            ->where('status', 'Inactive')
+            ->paginate(5);
+    
+        return view('staff.trashstaff', compact('staff'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
+    }
+
+    public function restore(string $id){
+        $staff = Staff::onlyTrashed()->find($id);
+
+        if ($staff) {
+            $staff->restore();
+            $staff->status = "Active";
+            $staff->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Staff restored successfully!',
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Staff not found or already restored.',
+            ]);
+        }
+    }
+    public function forcedelete(string $id){
+        $staff = Staff::withTrashed()->findOrFail($id);
+        $staff->forceDelete();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Staff permanently deleted!',
+        ]);
     }
 
     /**
@@ -107,7 +147,7 @@ class StaffController extends Controller
             $data->contactNumber = $request->contactNumber;
             $data->email = $request->email;
             $data->staffType = $request->staffType;
-            $data->status = $request->status;
+            // $data->status = $request->status;
             $data->save();
             return response()->json([
                 'status' => 'success',
@@ -128,7 +168,9 @@ class StaffController extends Controller
      */
     public function destroy(string $id)
     {
-        $data = Staff::find($id);        
+        $data = Staff::find($id);    
+        $data->status = 'Inactive';
+        $data->save();    
         $data->delete();
         return response()->json([
             'status' => 'success',
