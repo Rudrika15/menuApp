@@ -28,9 +28,13 @@ class MemberController extends Controller
                 'staffType' => 'required',
             ];
 
-            $validator =  Validator::make($request->all(), $rules);
+            $validator = Validator::make($request->all(), $rules);
+
             if ($validator->fails()) {
-                return $validator->errors();
+                $errors = $validator->errors();
+                $firstError = $errors->first();
+
+                return response()->json(['status' => false, 'message' => $firstError], 200);
             }
 
             $member = new Member();
@@ -68,7 +72,10 @@ class MemberController extends Controller
 
         $validator =  Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return $validator->errors();
+            $errors = $validator->errors();
+            $firstError = $errors->first();
+
+            return response()->json(['status' => false, 'message' => $firstError], 200);
         }
 
         $member = Member::where('email', $request->email)->first();
@@ -98,7 +105,10 @@ class MemberController extends Controller
 
         $validator =  Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return $validator->errors();
+            $errors = $validator->errors();
+            $firstError = $errors->first();
+
+            return response()->json(['status' => false, 'message' => $firstError], 200);
         }
 
         try {

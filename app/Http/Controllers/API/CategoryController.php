@@ -34,16 +34,16 @@ class CategoryController extends Controller
             'title' => 'required',
             'photo' => 'required',
         ];
-        
+
         $validator = Validator::make($request->all(), $rules);
-        
+
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $firstError = $errors->first(); 
-        
-        return response()->json(['status' => false, 'message' => $firstError], 200);
+            $firstError = $errors->first();
+
+            return response()->json(['status' => false, 'message' => $firstError], 200);
         }
-        
+
         try {
             $category = new Category();
             $category->title = $request->title;
@@ -67,8 +67,12 @@ class CategoryController extends Controller
         ];
 
         $validator = Validator::make($request->all(), $rules);
+
         if ($validator->fails()) {
-            return $validator->errors();
+            $errors = $validator->errors();
+            $firstError = $errors->first();
+
+            return response()->json(['status' => false, 'message' => $firstError], 200);
         }
         try {
             $category = Category::find($id);

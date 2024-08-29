@@ -24,7 +24,10 @@ class RestaurantController extends Controller
         // Validating the request against the rules
         $validator = Validator::make(request()->all(), $rules);
         if ($validator->fails()) {
-            return response()->json(['status' => false, 'errors' => $validator->errors()], 200);
+            $errors = $validator->errors();
+            $firstError = $errors->first();
+
+            return response()->json(['status' => false, 'message' => $firstError], 200);
         }
 
         // Finding the restaurant by email
@@ -75,7 +78,10 @@ class RestaurantController extends Controller
 
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
-                return $validator->errors();
+                $errors = $validator->errors();
+                $firstError = $errors->first();
+
+                return response()->json(['status' => false, 'message' => $firstError], 200);
             }
 
 

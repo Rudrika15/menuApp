@@ -65,7 +65,10 @@ class TableController extends Controller
 
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
-                return $validator->errors();
+                $errors = $validator->errors();
+                $firstError = $errors->first();
+
+                return response()->json(['status' => false, 'message' => $firstError], 200);
             }
 
             $table = new Table();
@@ -92,7 +95,10 @@ class TableController extends Controller
 
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
-                return $validator->errors();
+                $errors = $validator->errors();
+                $firstError = $errors->first();
+
+                return response()->json(['status' => false, 'message' => $firstError], 200);
             }
 
 
