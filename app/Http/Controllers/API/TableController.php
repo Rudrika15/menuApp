@@ -20,7 +20,7 @@ class TableController extends Controller
         $restaurant = Restaurant::where('token', $tokenData)->first();
         $restaurantId = $restaurant->id;
         try {
-            $tables = Table::where('restaurantId', $restaurantId);
+            $tables = Table::where('restaurantId', $restaurantId)->where('status', '!=', 'Deleted');
             if ($search) {
                 $tables = $tables->where('tableNumber', 'like', '%' . $search . '%');
             }

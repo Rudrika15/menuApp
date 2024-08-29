@@ -133,7 +133,7 @@ class MemberController extends Controller
             }
             $member->status = 'Deleted';
             $member->save();
-            return Util::postResponse($member, 'Staff deleted successfully');
+            return Util::getResponse($member, 'Staff deleted successfully');
         } catch (\Throwable $th) {
             return Util::getErrorResponse($th);
         }
