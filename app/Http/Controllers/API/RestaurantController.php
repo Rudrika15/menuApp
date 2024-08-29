@@ -24,18 +24,18 @@ class RestaurantController extends Controller
         // Validating the request against the rules
         $validator = Validator::make(request()->all(), $rules);
         if ($validator->fails()) {
-            return response()->json(['status' => 'failed', 'errors' => $validator->errors()], 422);
+            return response()->json(['status' => false, 'errors' => $validator->errors()], 200);
         }
 
         // Finding the restaurant by email
         $restaurant = Restaurant::where('email', request('email'))->first();
         if (!$restaurant) {
-            return response()->json(['status' => 'failed', 'message' => 'User not found'], 404);
+            return response()->json(['status' => false, 'message' => 'User not found'], 200);
         }
 
         // Checking if the password is correct
         if (!Hash::check(request('password'), $restaurant->password)) {
-            return response()->json(['status' => 'failed', 'message' => 'Incorrect password'], 401);
+            return response()->json(['status' => false, 'message' => 'Incorrect password'], 200);
         }
 
         // Generating a new token and saving it to the restaurant

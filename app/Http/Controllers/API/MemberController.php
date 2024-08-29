@@ -73,11 +73,11 @@ class MemberController extends Controller
 
         $member = Member::where('email', $request->email)->first();
         if (!$member) {
-            return response()->json(['status' => 'failed', 'message' => 'User not found'], 404);
+            return response()->json(['status' => false, 'message' => 'User not found'], 200);
         }
 
         if (!Hash::check($request->password, $member->password)) {
-            return response()->json(['status' => 'failed', 'message' => 'Incorrect password'], 404);
+            return response()->json(['status' => false, 'message' => 'Incorrect password'], 200);
         }
 
         $member->token = Util::generateToken();
@@ -104,7 +104,7 @@ class MemberController extends Controller
         try {
             $member = Member::where('id', $id)->where('restaurantId', $restaurantId)->first();
             if (!$member) {
-                return response()->json(['status' => 'failed', 'message' => 'User not found'], 404);
+                return response()->json(['status' => false, 'message' => 'User not found'], 200);
             }
 
             $member->name = $request->name;
@@ -129,7 +129,7 @@ class MemberController extends Controller
         try {
             $member = Member::where('id', $id)->where('restaurantId', $restaurantId)->first();
             if (!$member) {
-                return response()->json(['status' => 'failed', 'message' => 'User not found'], 404);
+                return response()->json(['status' => false, 'message' => 'User not found'], 200);
             }
             $member->status = 'Deleted';
             $member->save();

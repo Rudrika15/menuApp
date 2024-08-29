@@ -98,7 +98,7 @@ class TableController extends Controller
 
             $table = Table::find($id);
             if (!$table) {
-                return response()->json(['status' => 'failed', 'message' => 'Table not found'], 404);
+                return response()->json(['status' => false, 'message' => 'Table not found'], 200);
             }
             $table->tableNumber = $request->tableNumber;
             $table->capacity = $request->capacity;
@@ -113,10 +113,10 @@ class TableController extends Controller
     {
         $table = Table::find($id);
         if (!$table) {
-            return response()->json(['status' => 'failed', 'message' => 'Table not found'], 404);
+            return response()->json(['status' => false, 'message' => 'Table not found'], 200);
         }
         $table->status = 'Deleted';
         $table->save();
-        return Util::postResponse($table, 'Table deleted successfully');
+        return Util::getResponse($table, 'Table deleted successfully');
     }
 }
