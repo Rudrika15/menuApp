@@ -24,6 +24,18 @@ class CategoryController extends Controller
             Util::getErrorResponse($th);
         }
     }
+    public function getTrashCategories(Request $request)
+    {
+        try {
+            $tokenData = $request->header('token');
+            $restaurant = Restaurant::where('token', $tokenData)->first();
+            $restaurantId = $restaurant->id;
+            $categories = Category::where('restaurantId', $restaurantId)->where('status', '=', 'Deleted')->get();
+            return Util::getResponse($categories);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
 
     public function addCategories(Request $request)
     {

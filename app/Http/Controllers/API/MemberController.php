@@ -63,6 +63,18 @@ class MemberController extends Controller
             Util::getErrorResponse($th);
         }
     }
+    public function getTrashStaffs(Request $request)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+        try {
+            $staffs = Member::where('restaurantId', $restaurantId)->where('status', '=', 'Deleted')->get();
+            return Util::getResponse($staffs);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
     public function staffLogin(Request $request)
     {
         $rules = [

@@ -47,18 +47,21 @@ Route::middleware('auth.restaurant')->group(function () {
 
     // staff routes
     Route::get('/staff', [MemberController::class, 'getStaffs']);
+    Route::get('/trashStaff', [MemberController::class, 'getTrashStaffs']);
     Route::post('/staff', [MemberController::class, 'addStaffs']);
     Route::put('/staff/{id?}', [MemberController::class, 'editStaff']);
     Route::delete('/staff/{id?}', [MemberController::class, 'deleteStaff']);
 
     // Category api
     Route::get('/categories', [CategoryController::class, 'getCategories']);
+    Route::get('/trashCategories/{id?}', [CategoryController::class, 'getTrashCategories']);
     Route::post('/categories', [CategoryController::class, 'addCategories']);
     Route::put('/category/{id?}', [CategoryController::class, 'editCategories']);
     Route::delete('/category/{id?}', [CategoryController::class, 'deleteCategories']);
 
     // menu api
     Route::get('/menu', [MenuController::class, 'getMenus']);
+    Route::get('/trashMenu', [MenuController::class, 'getTrashMenus']);
     // Route::post('/menu', [MenuController::class, 'addMenu']);
     // Route::put('/menu/edit/{id?}', [MenuController::class, 'editMenu']);
     // Route::delete('/menu/delete/{id?}', [MenuController::class, 'deleteMenu']);
