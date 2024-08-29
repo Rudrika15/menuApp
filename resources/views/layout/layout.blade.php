@@ -15,15 +15,22 @@
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-
     <!-- Custom styles for this template-->
     <link href="{{asset('css/sb-admin-2.min.css')}}" rel="stylesheet">
+
+    <link href="{{asset('css/sb-admin-2.min.css')}}" rel="stylesheet">
+
+    <!--jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Toastr CSS and JS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
+    <!-- SweetAlert CSS and JS -->
     <script src="https://lipis.github.io/bootstrap-sweetalert/dist/sweetalert.js"></script>
     <link rel="stylesheet" href="https://lipis.github.io/bootstrap-sweetalert/dist/sweetalert.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  
   
 </head>
 
@@ -90,7 +97,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Custom Pages:</h6>
                         <a class="collapse-item" href="{{route('menu.create')}}">Create New Menu</a>
-                        <a class="collapse-item" href="{{route('menu.index')}}">View</a>
+                        <a class="collapse-item" href="{{route('menu.index')}}">View Menus</a>
                         <a class="collapse-item" href="{{route('trashmenu.view')}}">Trash Delete</a>
                     </div>
                 </div>
@@ -107,7 +114,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Custom Pages:</h6>
                         <a class="collapse-item" href="{{route('staff.create')}}">Create New Staff</a>
-                        <a class="collapse-item" href="{{route('staff.index')}}">View</a>
+                        <a class="collapse-item" href="{{route('staff.index')}}">View Staffs</a>
                         <a class="collapse-item" href="{{route('trashstaff.view')}}">Trash Delete</a>
                     </div>
                 </div>
@@ -125,8 +132,23 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Custom Pages:</h6>
                         <a class="collapse-item" href="{{route('table.create')}}">Create New Table</a>
-                        <a class="collapse-item" href="{{route('table.index')}}">View</a>
+                        <a class="collapse-item" href="{{route('table.index')}}">View Tables</a>
                         <a class="collapse-item" href="{{route('trashtable.view')}}">Trash Delete</a>
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOrder"
+                    aria-expanded="true" aria-controls="collapseOrder">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Order</span>
+                </a>
+                <div id="collapseOrder" class="collapse" aria-labelledby="headingOrder"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Custom Pages:</h6>
+                        <a class="collapse-item" href="{{route('order.index')}}">View Orders</a>
                     </div>
                 </div>
             </li>
@@ -276,10 +298,11 @@
             </div>
         </div>
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap core JavaScript-->
     <script src="{{asset('vendor/jquery/jquery.min.js')}}"></script>
     <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <!-- Core plugin JavaScript-->
     <script src="{{asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>

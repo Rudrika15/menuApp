@@ -15,4 +15,8 @@ class Table extends Model
         return $this->belongsTo(Restaurant::class,'restaurantId','id');
     }
 
+    public function oredermaster(){
+        return $this->hasMany(OrderMaster::class,'id');
+    }
+
 }

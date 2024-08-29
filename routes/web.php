@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TableController;
 use Illuminate\Support\Facades\Route;
@@ -72,6 +73,8 @@ Route::group(['middleware' => ['ValidUser']], function () {
     Route::get('trashtable/view',[TableController::class,'trashtable'])->name('trashtable.view');
     Route::get('trashtable/restore/{id}',[TableController::class,'restore'])->name('restore.table');
     Route::get('trashtable/forcedelete/{id}',[TableController::class,'forcedelete'])->name('forcedelete.table');
+    Route::get('orderindex',[OrderController::class,'index'])->name('order.index');
+    Route::get('orderdetail',[OrderController::class,'create'])->name('orderdetail.create');
     Route::get('/profileedit', [RegisterController::class, 'edit'])->name('profile.edit');
     Route::post('/profileupdate', [RegisterController::class, 'update'])->name('profile.update');
 

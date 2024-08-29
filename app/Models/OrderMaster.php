@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class OrderMaster extends Model
 {
     use HasFactory;
+
+    public function table(){
+        return $this->belongsTo(Table::class,'tableId');
+    }
 }

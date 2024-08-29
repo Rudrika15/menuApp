@@ -11,7 +11,7 @@
 </div>
 @if($table->count() !== 0)
 
-<table class="table table-bordered text-center">
+<table class="table table-bordered text-center bg-white">
     <tr>
         <th>No</th>
         <th>TableNumber</th>

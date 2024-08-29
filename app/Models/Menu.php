@@ -17,5 +17,9 @@ class Menu extends Model
     public function category(){
         return $this->belongsTo(Category::class,'categoryId','id')->withTrashed();
     }
+    public function orderdetail(){
+        return $this->haseMany(OrderDetail::class,'menuId','id');
+    }
+
 
 }

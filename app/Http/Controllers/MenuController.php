@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Menu;
+use App\Models\Category;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-
+use Yajra\DataTables\DataTables;
 
 class MenuController extends Controller
 {
@@ -16,25 +16,37 @@ class MenuController extends Controller
      */
     public function index(Request $request)
     {
-        $restaurantId = Session::get('id');   
-        $categories = Category::where('restaurantId',$restaurantId)->get();
-        $menurestaurant = Menu::with('category')->where('restaurantId',$restaurantId);
-        
-        if ($request->has('categoryId') && $request->categoryId != '') {
-            $menurestaurant->where('categoryId', $request->categoryId);
+        $restaurantId = Session::get('id');
+        $categories = Category::where('restaurantId', $restaurantId)->get();
+        $menurestaurant = Menu::with('category')->where('restaurantId', $restaurantId);
+    
+        // Apply category filter if provided
+        if ($request->has('categoryId') && !empty($request->categoryId)) {
+            $menurestaurant = $menurestaurant->where('categoryId', $request->categoryId);
         }
-        
+    
         if ($request->ajax()) {
-            $menus = $menurestaurant->get();
-            return response()->json([
-                'menus' => $menus,
-            ]);
-        }    
-        $menu = $menurestaurant->paginate(5);
-        return view('menu.menuindex',compact('menu','categories'))
-        ->with('i', (request()->input('page', 1) - 1) * 5);
-        
-    }
+            return DataTables::of($menurestaurant)
+                ->addIndexColumn()
+                ->addColumn('category_name', function($row){
+                    return $row->category ? $row->category->title : 'No Category';
+                })
+                ->addColumn('action', function($row){
+                    $btn = '<a href="'.route('menu.show', $row->id).'" class="btn btn-outline-info btn-sm"><i class="fa fa-eye"></i> Show</a>';
+                    $btn .= ' <a href="'.route('menu.edit', $row->id).'" class="btn btn-outline-warning btn-sm"><i class="fa fa-pencil-alt"></i> Edit</a>';
+                    $btn .= ' <button class="btn btn-outline-danger btn-sm remove" data-id="'.$row->id.'" data-url="'.route('menu.destroy', $row->id).'"><i class="fa fa-trash"></i> Delete</button>';
+                    return $btn;
+                })
+                ->editColumn('photo', function($row) {
+                    $photoUrl = $row->photo ? asset('menuImage/'.$row->photo) : 'https://via.placeholder.com/100'; // Placeholder if no image
+                    return '<img src="'.$photoUrl.'" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;">';
+                })
+                ->rawColumns(['action', 'photo'])
+                ->make(true);
+        }
+    
+        return view('menu.menuindex', compact('categories'));        
+        }
 
     /**
      * Show the form for creating a new resource.

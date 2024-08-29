@@ -41,7 +41,7 @@
         </div>
         <div class="form-group">
             <strong>Image:</strong>
-            <img id="output"  class="img-fluid img-thumbnail" src="{{ asset('restaurantLogo/' .$restaurant->logo) }}" alt="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;">
+            <img id="output"  class="img-fluid img-thumbnail" src="{{ asset('restaurantLogo/' .$restaurant->logo) }}" alt="" style="max-width: 150px; max-height: 150px; object-fit: cover; border-radius: 5px;">
         </div>
     
         {{-- <div class="col-xs-12 col-sm-12 col-md-12"> --}}
