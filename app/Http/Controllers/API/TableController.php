@@ -117,12 +117,29 @@ class TableController extends Controller
 
     public function deleteTable($id)
     {
-        $table = Table::find($id);
-        if (!$table) {
-            return response()->json(['status' => false, 'message' => 'Table not found'], 200);
+        try {
+            $table = Table::find($id);
+            if (!$table) {
+                return response()->json(['status' => false, 'message' => 'Table not found'], 200);
+            }
+            $table->status = 'Deleted';
+            $table->save();
+            return Util::getResponse($table, 'Table deleted successfully');
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
         }
-        $table->status = 'Deleted';
-        $table->save();
-        return Util::getResponse($table, 'Table deleted successfully');
+    }
+
+    public function getTrashTable(Request $request)
+    {
+        try {
+            $tokenData = $request->header('token');
+            $restaurant = Restaurant::where('token', $tokenData)->first();
+            $restaurantId = $restaurant->id;
+            $category = Table::where('restaurantId', $restaurantId)->where('status', '=', 'Deleted')->get();
+            return Util::getResponse($category);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
     }
 }

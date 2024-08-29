@@ -37,6 +37,45 @@ class CategoryController extends Controller
         }
     }
 
+    public function restoreDeletedCategory(Request $request, $id)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+
+        try {
+            $category = Category::where('id', $id)->where('restaurantId', $restaurantId)
+                ->where('status', '=', 'Deleted')->first();
+            if (!$category) {
+                return Util::getErrorResponse("Category not found");
+            }
+            $category->status = 'Active';
+            $category->save();
+            return Util::getResponse($category);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
+
+    public function permanentDeleteCategory(Request $request, $id)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+
+        try {
+            $category = Category::where('id', $id)->where('restaurantId', $restaurantId)
+                ->where('status', '=', 'Deleted')->first();
+            if (!$category) {
+                return Util::getErrorResponse("Category not found");
+            }
+            $category->delete();
+            return Util::getResponse($category);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
+
     public function addCategories(Request $request)
     {
         $tokenData = $request->header('token');

@@ -19,13 +19,13 @@ class VerifyMemberToken
         $token = $request->header('token');
 
         if (!$token) {
-            return response()->json(['status' => false, 'message' => 'Token not provided'], 401);
+            return response()->json(['status' => false, 'message' => 'Token not provided'], 200);
         }
 
         $member = Member::where('token', $token)->first();
 
         if (!$member) {
-            return response()->json(['status' => false, 'message' => 'Invalid token'], 401);
+            return response()->json(['status' => false, 'message' => 'Invalid token'], 200);
         }
         $request->attributes->set('member', $member);
 
