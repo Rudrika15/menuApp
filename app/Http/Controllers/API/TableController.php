@@ -142,4 +142,42 @@ class TableController extends Controller
             Util::getErrorResponse($th);
         }
     }
+
+    public function restoreDeletedTable(Request $request, $id)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+
+        try {
+            $table = Table::where('id', $id)->where('restaurantId', $restaurantId)
+                ->where('status', '=', 'Deleted')->first();
+            if (!$table) {
+                return Util::getErrorResponse("table not found");
+            }
+            $table->status = 'Active';
+            $table->save();
+            return Util::getResponse($table);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
+    public function permanentDeleteTable(Request $request, $id)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+
+        try {
+            $table = Table::where('id', $id)->where('restaurantId', $restaurantId)
+                ->where('status', '=', 'Deleted')->first();
+            if (!$table) {
+                return Util::getErrorResponse("table not found");
+            }
+            $table->delete();
+            return Util::getResponse($table);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
 }

@@ -46,8 +46,8 @@ Route::middleware('auth.restaurant')->group(function () {
     Route::delete('/table/delete/{id?}', [TableController::class, 'deleteTable']);
     // trash
     Route::get('/trashTable', [TableController::class, 'getTrashTable']);
-    Route::put('/category/restore/{id?}', [TableController::class, 'restoreDeletedCategory']);
-    Route::delete('/category/delete/{id?}', [TableController::class, 'permanentDeleteCategory']);
+    Route::put('/table/restore/{id?}', [TableController::class, 'restoreDeletedTable']);
+    Route::delete('/table/delete/{id?}', [TableController::class, 'permanentDeleteTable']);
 
 
     // staff routes
@@ -56,6 +56,11 @@ Route::middleware('auth.restaurant')->group(function () {
     Route::post('/staff', [MemberController::class, 'addStaffs']);
     Route::put('/staff/{id?}', [MemberController::class, 'editStaff']);
     Route::delete('/staff/{id?}', [MemberController::class, 'deleteStaff']);
+    // trash 
+    Route::get('/trashStaff', [MemberController::class, 'getTrashStaff']);
+    Route::put('/staff/restore/{id?}', [MemberController::class, 'restoreDeletedStaff']);
+    Route::delete('/staff/delete/{id?}', [MemberController::class, 'permanentDeleteStaff']);
+
 
     // Category api
     Route::get('/categories', [CategoryController::class, 'getCategories']);
@@ -69,10 +74,11 @@ Route::middleware('auth.restaurant')->group(function () {
 
     // menu api
     Route::get('/menu', [MenuController::class, 'getMenus']);
-    Route::get('/trashMenu', [MenuController::class, 'getTrashMenus']);
     // Route::post('/menu', [MenuController::class, 'addMenu']);
     // Route::put('/menu/edit/{id?}', [MenuController::class, 'editMenu']);
     // Route::delete('/menu/delete/{id?}', [MenuController::class, 'deleteMenu']);
+    // trash
+    Route::get('/trashMenu', [MenuController::class, 'getTrashMenus']);
 });
 
 Route::get('/pass', [CategoryController::class, 'addPassword']);

@@ -160,4 +160,55 @@ class MemberController extends Controller
             return Util::getErrorResponse($th);
         }
     }
+
+    public function getTrashStaff(Request $request)
+    {
+        try {
+            $tokenData = $request->header('token');
+            $restaurant = Restaurant::where('token', $tokenData)->first();
+            $restaurantId = $restaurant->id;
+            $staff = Member::where('restaurantId', $restaurantId)->where('status', '=', 'Deleted')->get();
+            return Util::getResponse($staff);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
+
+    public function restoreDeletedStaff(Request $request, $id)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+
+        try {
+            $staff = Member::where('id', $id)->where('restaurantId', $restaurantId)
+                ->where('status', '=', 'Deleted')->first();
+            if (!$staff) {
+                return Util::getErrorResponse("staff not found");
+            }
+            $staff->status = 'Active';
+            $staff->save();
+            return Util::getResponse($staff);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
+    public function permanentDeleteStaff(Request $request, $id)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+
+        try {
+            $staff = Member::where('id', $id)->where('restaurantId', $restaurantId)
+                ->where('status', '=', 'Deleted')->first();
+            if (!$staff) {
+                return Util::getErrorResponse("staff not found");
+            }
+            $staff->delete();
+            return Util::getResponse($staff);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
 }
