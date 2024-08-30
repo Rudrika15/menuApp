@@ -13,23 +13,22 @@ use Illuminate\Support\Facades\Session;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         if($request->ajax()){
             $restaurantId = Session::get('id');
             $data = OrderMaster::whereHas('table',function($query) use ($restaurantId){
                 $query->where('restaurantId', $restaurantId);
-            })->with('table')->select('order_masters.*');
+            })
+            ->where('status','Active')
+            ->with('table')->select('order_masters.*');
             return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('date', function($row){
                 return $row->created_at->format('d/m/y');
             })
             ->addColumn('action', function($row){
-                return '<a href="'.route('orderdetail.create',['orderId' => $row->id]).'" class="btn btn-outline-info btn-sm"><i class="fa fa-print"></i> Print</a>';
+                return '<a href="'.route('orderdetail.create',['orderId' => $row->id]).'" class="btn btn-outline-info btn-sm"><i class="fa fa-eye"></i> Preview</a>';
             })
             ->rawColumns(['action'])
             ->make(true);
@@ -38,9 +37,6 @@ class OrderController extends Controller
         return view('order.orderview');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(Request $request)
     {
         $orderId = $request->input('orderId');
@@ -51,32 +47,48 @@ class OrderController extends Controller
             ->get();
         $restaurant = Restaurant::first();
 
-        return view('order.orderdetail', compact('order', 'orderDetails','restaurant'));
+        return view('order.orderdetail', compact('order', 'orderDetails','restaurant')) ->with('i', (request()->input('page', 1) - 1) * 5);
     }
     
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function printorder(Request $request,$orderId)
     {
-        //
+        $order = OrderMaster::findOrFail($orderId);
+        
+        $orderDetails = OrderDetail::with('menu')
+            ->where('orderId', $orderId)
+            ->get();
+        $restaurant = Restaurant::first();
+
+        return view('order.orderbill', compact('order', 'orderDetails','restaurant')) ->with('i', (request()->input('page', 1) - 1) * 5);
+
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function oldorderindex(Request $request)
     {
-        //
+        if($request->ajax()){
+            $restaurantId = Session::get('id');
+            $data = OrderMaster::whereHas('table',function($query) use ($restaurantId){
+                $query->where('restaurantId', $restaurantId);
+            })
+            ->where('status','Inactive')
+            ->with('table')->select('order_masters.*');
+            return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('date', function($row){
+                return $row->created_at->format('d/m/y');
+            })
+            ->addColumn('action', function($row){
+                return '<a href="'.route('orderdetail.create',['orderId' => $row->id]).'" class="btn btn-outline-info btn-sm"><i class="fa fa-eye"></i> Preview</a>';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+            
+        }
+        return view('order.oldorderview');
+
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    
 
     /**
      * Update the specified resource in storage.

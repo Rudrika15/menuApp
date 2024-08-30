@@ -17,16 +17,16 @@
     </div>
 </div>
 
-<table class="table table-bordered data-table bg-white">
+<table class="table table-bordered data-table bg-white text-center">
     <thead>
         <tr>
-            <th>No</th>
-            <th>Category Name</th>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Photo</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th style="text-align: center">No</th>
+            <th style="text-align: center">Category Name</th>
+            <th style="text-align: center">Title</th>
+            <th style="text-align: center">Price</th>
+            <th style="text-align: center">Photo</th>
+            <th style="text-align: center">Status</th>
+            <th style="text-align: center">Action</th>
         </tr>
     </thead>
     <tbody>
@@ -46,23 +46,29 @@
             },
             columns: [
                 { data: null, name: 'id', orderable: false, searchable: false ,
-
                 render: function(data,type,row,meta){
                     return meta.row + 1;
                 }
                 },
 
-                {data: 'category_name', name: 'category_name'},
-                {data: 'title', name: 'title'},
-                {data: 'price', name: 'price',
+                {data: 'category_name', name: 'category_name',orderable: false},
+                {data: 'title', name: 'title',orderable: false},
+                {data: 'price', name: 'price',orderable: false,
                     render: function(data,type,row,meta){
                         return number_format(data,2);
                     }
                 },
                 {data: 'photo', name: 'photo', orderable: false, searchable: false},
-                {data: 'status', name: 'status'},
+                {data: 'status', name: 'status',orderable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
-            ]
+            ],
+            columnDefs: [
+            {
+                targets: 0, 
+                orderable: false
+            }
+            ],
+        order: [] 
         });
 
         $('#categoryFilter').change(function() {

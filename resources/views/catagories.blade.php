@@ -16,10 +16,7 @@
         <th>Title</th>
         <th>Photo</th>
         <th>Status</th>
-        <th>Show</th>
-        <th>Edit</th>
-        <th>Delete</th>
-
+        <th>Action</th>
     </tr>
     @foreach ($category as $item)
     <tr>
@@ -30,12 +27,8 @@
         <td>
             <a href="{{route('category.show',$item->id)}}"  class="btn btn-outline-info btn-sm"><i class="fa fa-eye"></i>
                 Show</a>
-        </td>
-        <td>
             <a href="{{route('category.edit',$item->id)}}" class="btn btn-outline-warning btn-sm"><i
                     class="fa fa-pencil-alt"></i> Edit</a>
-        </td>
-        <td>
             <button class="btn btn-outline-danger btn-sm remove" data-id="{{$item->id}}"> <i class="fa fa-trash"></i>
                 Delete</button>
         </td>

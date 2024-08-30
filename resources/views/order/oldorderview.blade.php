@@ -3,10 +3,10 @@
 @section('content')
 <div class="row">
     <div class="col-lg-12 margin-tb">
-        <h1>Order List</h1>
+        <h1>Old Order List</h1>
     </div>
 </div>
-    <table class="table table-bordered data-table bg-white text-center">
+    <table class="table table-bordered data-tables bg-white text-center">
         <thead>
             <tr>
                 <th style="text-align: center">No</th>
@@ -23,10 +23,10 @@
 
 <script type="text/javascript">
   $(function () {
-    var table = $('.data-table').DataTable({
+    var table = $('.data-tables').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('order.index') }}",
+        ajax: "{{ route('oldorder.index') }}",
         columns: [
             { data: null, name: 'id', orderable: false, searchable: false ,
 
@@ -42,11 +42,11 @@
             {data: 'action', name: 'action', orderable: false, searchable: false},
         ],
         columnDefs: [
-            {
-                targets: 0, 
-                orderable: false
-            }
-            ],
+        {
+            targets: 0, 
+            orderable: false
+        }
+        ],
         order: [] 
     });
   });

@@ -148,7 +148,8 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Custom Pages:</h6>
-                        <a class="collapse-item" href="{{route('order.index')}}">View Orders</a>
+                        <a class="collapse-item" href="{{route('order.index')}}">Active View Orders</a>
+                        <a class="collapse-item" href="{{route('oldorder.index')}}">Inactive View Orders</a>
                     </div>
                 </div>
             </li>

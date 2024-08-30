@@ -46,7 +46,7 @@ class MenuController extends Controller
         }
     
         return view('menu.menuindex', compact('categories'));        
-        }
+    }
 
     /**
      * Show the form for creating a new resource.
