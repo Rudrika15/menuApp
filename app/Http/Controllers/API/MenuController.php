@@ -14,20 +14,7 @@ class MenuController extends Controller
 {
 
 
-    public function menuList(Request $request)
-    {
-        $tokenData = $request->header('token');
-        $member = Member::where('token', $tokenData)->first();
-
-        $restaurantId = $member->restaurantId;
-
-        $menu = Menu::where('restaurantId', $restaurantId);
-        if ($request->search) {
-            $menu = $menu->where('title', 'like', '%' . $request->search . '%');
-        }
-        $menu = $menu->where('status', '!=', 'Deleted')->get();
-        return Util::getResponse($menu);
-    }
+   
 
     public function getMenus(Request $request)
     {

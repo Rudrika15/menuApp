@@ -6,6 +6,7 @@ use App\Http\Controllers\API\RestaurantController;
 use App\Http\Controllers\API\TableController;
 use App\Http\Controllers\API\StaffController;
 use App\Http\Controllers\API\MenuController;
+use App\Http\Controllers\MobileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,8 +35,8 @@ Route::get('/restaurant', [RestaurantController::class, 'getRestaurants']);
 Route::get('/restaurant/{id?}', [RestaurantController::class, 'getRestaurantById']);
 
 Route::middleware('auth.member')->group(function () {
-    Route::get('/tableList', [TableController::class, 'tableList']);
-    Route::get('/menuList', [MenuController::class, 'menuList']);
+    Route::get('/tableList', [MobileController::class, 'tableList']);
+    Route::get('/menuList', [MobileController::class, 'menuList']);
 });
 Route::middleware('auth.restaurant')->group(function () {
 

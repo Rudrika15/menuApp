@@ -31,25 +31,7 @@ class TableController extends Controller
             Util::getErrorResponse($th);
         }
     }
-    public function tableList(Request $request)
-    {
-        $tokenData = $request->header('token');
-        $search = $request->search;
-        $member = Member::where('token', $tokenData)->first();
-        $restaurantId = $member->restaurantId;
 
-        try {
-            $tables = Table::where('restaurantId', $restaurantId);
-            if ($search) {
-                $tables = $tables->where('tableNumber', 'like', '%' . $search . '%');
-            }
-
-            $tables = $tables->where('status', '!=', 'Deleted')->get();
-            return Util::getResponse($tables);
-        } catch (\Throwable $th) {
-            Util::getErrorResponse($th);
-        }
-    }
 
     public function addTables(Request $request)
     {
