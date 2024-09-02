@@ -34,8 +34,8 @@
         </td>
 
     </tr>
+
     @endforeach
-    
 </table>
 @else
 <div style="text-align: center; font-size: 2.5rem; margin-top: 76px">Record Not Found</div>
@@ -63,7 +63,8 @@
             if(isConfirm){
                     $.ajax({
                         url: url,
-                        type: 'GET',
+                        type: 'DELETE',
+                        data: {_token:'{{csrf_token()}}'},
                         success: function(response) {
                             if (response.status === 'success') {
                               toastr.success(response.message, 'success');

@@ -97,7 +97,8 @@
             if(isConfirm){
                     $.ajax({
                         url: url,
-                        type: 'GET',
+                        type: 'DELETE',
+                        data: {_token:'{{csrf_token()}}'},
                         success: function(response) {
                             if (response.status === 'success') {
                               toastr.success(response.message, 'success');
