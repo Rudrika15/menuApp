@@ -1,26 +1,63 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
-use App\Models\API\OrderMaster;
+use App\Helpers\Util;
+use App\Models\OrderMaster;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Session;
+
 
 class OrderMasterController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function getActiveorders(Request $request)
     {
-        //
+        $restaurant =  $request->get('restaurant')->id; 
+        $data = OrderMaster::whereHas('table',function($query) use ($restaurant){
+            $query->where('restaurantId', $restaurant);
+            
+        })->with('table')->where('status','Active');
+
+        if(isset($request->tableId)){
+            $data = $data->where('tableId', $request->tableId);
+        }
+        if(isset($request->name)){
+            $data = $data->where('name','like','%'.$request->name .'%');
+        }
+        if(isset($request->contactNumber)){
+            $data = $data->where('contactNumber',$request->contactNumber);
+        }
+        $order = $data->get();
+        return Util::getResponse($order);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function getInactiverders(Request $request)
     {
-        //
+        $restaurant =  $request->get('restaurant')->id; 
+
+        $data = OrderMaster::whereHas('table',function($query) use ($restaurant){
+            $query->where('restaurantId', $restaurant);
+            
+        })->with('table')->where('status','Inactive');    
+
+        if(isset($request->tableId)){
+            $data = $data->where('tableId', $request->tableId);
+        }
+        if(isset($request->name)){
+            $data = $data->where('name','like','%'.$request->name .'%');
+        }
+        if(isset($request->contactNumber)){
+            $data = $data->where('contactNumber',$request->contactNumber);
+        }
+        $order = $data->get();
+        return Util::getResponse($order);
     }
 
     /**

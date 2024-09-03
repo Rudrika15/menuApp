@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
-
-use App\Models\API\AddToCart;
+namespace App\Http\Controllers\API;
+use App\Http\Controllers\Controller;
+use App\Models\AddToCart;
 use Illuminate\Http\Request;
 
 class AddToCartController extends Controller

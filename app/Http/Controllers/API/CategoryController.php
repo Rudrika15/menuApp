@@ -3,52 +3,79 @@
 namespace App\Http\Controllers\API;
 
 use App\Helpers\Util;
-use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
 
 class CategoryController extends Controller
 {
-    public function getCategories(Request $request)
+    /**
+     * Display a listing of the resource.
+     */
+    public function getcategory(Request $request)
     {
-        try {
-            $tokenData = $request->header('token');
-            $restaurant = Restaurant::where('token', $tokenData)->first();
-            $restaurantId = $restaurant->id;
-            $categories = Category::where('restaurantId', $restaurantId)->get();
-            return Util::getResponse($categories);
-        } catch (\Throwable $th) {
-            Util::getErrorResponse($th);
-        }
+        $restaurant =  $request->get('restaurant');
+        $category = Category::where('restaurantId',$restaurant->id)->where('status','Active')->get();
+        return Util::getResponse($category); 
     }
 
-    public function addCategories(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
     {
-        $tokenData = $request->header('token');
-        $restaurant = Restaurant::where('token', $tokenData)->first();
-        $restaurantId = $restaurant->id;
-        $rules = [
-            'title' => 'required',
-            'photo' => 'required',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return $validator->errors();
-        }
-
         try {
-            $category = new Category();
-            $category->title = $request->title;
-            $category->photo = time() . '.' . $request->photo->extension();
-            $request->photo->move(public_path('categoryPhoto'), $category->photo);
-            $category->restaurantId = $restaurantId;
-            $category->save();
-            return Util::postResponse($category, "categoryPhoto/" . $category->photo);
-        } catch (\Throwable $th) {
+            $validatedData = $request->validate([
+                'title' => 'required',
+            ]);
+            $restaurant =  $request->get('restaurant');
+            $data = new Category();
+            $data->restaurantid = $restaurant->id;
+            $data->title = $request->title;
+            if ($image = $request->file('photo')) {
+                $path = 'categoryImage/';
+                $imagename = time() . "." . $image->getClientOriginalExtension();
+                $image->move($path, $imagename);
+                $data->photo = $imagename;
+            }
+            $data->save();
+            return Util::postResponse($data, 'Category added successfully'); 
+
+        } catch(\Throwable $th){
             Util::getErrorResponse($th);
         }
+
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Category $category)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Category $category)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Category $category)
+    {
+        //
     }
 }
