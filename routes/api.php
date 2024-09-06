@@ -41,9 +41,10 @@ Route::middleware('auth.restaurant')->group(function () {
 
     //table routes
     Route::get('/table', [TableController::class, 'getTables']);
+    Route::get('/table/byId/{id?}', [TableController::class, 'getTableById']);
     Route::post('/table', [TableController::class, 'addTables']);
     Route::put('/table/edit/{id?}', [TableController::class, 'editTable']);
-    Route::delete('/table/delete/{id?}', [TableController::class, 'deleteTable']);
+    Route::delete('/table/{id?}', [TableController::class, 'deleteTable']);
     // trash
     Route::get('/trashTable', [TableController::class, 'getTrashTable']);
     Route::put('/table/restore/{id?}', [TableController::class, 'restoreDeletedTable']);
@@ -52,6 +53,7 @@ Route::middleware('auth.restaurant')->group(function () {
 
     // staff routes
     Route::get('/staff', [MemberController::class, 'getStaffs']);
+    Route::get('/staff/byId/{id?}', [MemberController::class, 'getStaffById']);
     Route::get('/trashStaff', [MemberController::class, 'getTrashStaffs']);
     Route::post('/staff', [MemberController::class, 'addStaffs']);
     Route::put('/staff/{id?}', [MemberController::class, 'editStaff']);
@@ -64,6 +66,7 @@ Route::middleware('auth.restaurant')->group(function () {
 
     // Category api
     Route::get('/categories', [CategoryController::class, 'getCategories']);
+    Route::get('/category/byId/{id?}', [CategoryController::class, 'getCategoryById']);
     Route::post('/categories', [CategoryController::class, 'addCategories']);
     Route::put('/category/{id?}', [CategoryController::class, 'editCategories']);
     Route::delete('/category/{id?}', [CategoryController::class, 'deleteCategories']);

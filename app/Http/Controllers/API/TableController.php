@@ -31,6 +31,22 @@ class TableController extends Controller
             Util::getErrorResponse($th);
         }
     }
+
+    public function getTableById(Request $request, $id)
+    {
+        $tokenData = $request->header('token');
+        $search = $request->search;
+        $restaurant = Restaurant::where('token', $tokenData)->first();
+        $restaurantId = $restaurant->id;
+        try {
+            $table = Table::where('id', $id)
+            ->where('restaurantId', $restaurantId)
+            ->where('status', '!=', 'Deleted')->first();
+            return Util::getResponse($table);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
+        }
+    }
     public function tableList(Request $request)
     {
         $tokenData = $request->header('token');
@@ -155,7 +171,7 @@ class TableController extends Controller
             if (!$table) {
                 return Util::getErrorResponse("table not found");
             }
-            $table->status = 'Active';
+            $table->status = 'Available';
             $table->save();
             return Util::getResponse($table);
         } catch (\Throwable $th) {
