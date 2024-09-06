@@ -40,8 +40,8 @@ class TableController extends Controller
         $restaurantId = $restaurant->id;
         try {
             $table = Table::where('id', $id)
-            ->where('restaurantId', $restaurantId)
-            ->where('status', '!=', 'Deleted')->first();
+                ->where('restaurantId', $restaurantId)
+                ->where('status', '!=', 'Deleted')->first();
             return Util::getResponse($table);
         } catch (\Throwable $th) {
             Util::getErrorResponse($th);
@@ -53,18 +53,6 @@ class TableController extends Controller
         $search = $request->search;
         $member = Member::where('token', $tokenData)->first();
         $restaurantId = $member->restaurantId;
-
-        try {
-            $tables = Table::where('restaurantId', $restaurantId);
-            if ($search) {
-                $tables = $tables->where('tableNumber', 'like', '%' . $search . '%');
-            }
-
-            $tables = $tables->where('status', '!=', 'Deleted')->get();
-            return Util::getResponse($tables);
-        } catch (\Throwable $th) {
-            Util::getErrorResponse($th);
-        }
     }
 
     public function addTables(Request $request)
