@@ -33,6 +33,30 @@ class MobileController extends Controller
             Util::getErrorResponse($th);
         }
     }
+    public function changeTableStatus(Request $request)
+    {
+        $request->validate([
+            'table_ids' => 'required|array|min:1',
+          
+        ]);
+
+        $tableIds = $request->input('table_ids');
+
+        $minTableId = min($tableIds);
+
+        Table::where('id', $minTableId)->update(['status' => 'Booked']);
+
+        Table::whereIn('id', $tableIds)
+            ->where('id', '!=', $minTableId)
+            ->update(['status' => 'merge','mergeWith' => $minTableId]);
+            
+            
+
+        return response()->json([
+            'message' => 'Table statuses updated successfully',
+            'min_table_id' => $minTableId,
+        ]);
+    }
     
 
     public function menuList(Request $request)

@@ -40,6 +40,7 @@ Route::middleware('auth.member')->group(function () {
     Route::get('/categoryList', [MobileController::class, 'categoryList']);
     // Route::get('/addToCart', [MobileController::class, 'addToCart']);
     Route::post('/addToCart', [MobileController::class, 'addToCart']);
+    Route::post('/changeTableStatus', [MobileController::class, 'changeTableStatus']);
 });
 Route::middleware('auth.restaurant')->group(function () {
 
