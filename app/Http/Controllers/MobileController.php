@@ -64,7 +64,6 @@ class MobileController extends Controller
 
     public function addToCart(Request $request)
     {
-        // Validate the array of cart items
         $validator = Validator::make($request->all(), [
             '*.p_id' => 'required|exists:menus,id',
             '*.qty' => 'required|integer|min:1',
@@ -75,7 +74,7 @@ class MobileController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $cartItems = $request->all(); // Since the request is directly an array
+        $cartItems = $request->all();
         $addedItems = [];
 
         foreach ($cartItems as $item) {
@@ -85,9 +84,9 @@ class MobileController extends Controller
             $addToCart->quantity = $item['qty'];
             $addToCart->save();
 
-            $addedItems[] = $addToCart; // Collect saved items to return later
+            $addedItems[] = $addToCart; 
         }
 
-        return Util::getResponse($addedItems); // Return the collection of added items
+        return Util::getResponse($addedItems);
     }
 }
