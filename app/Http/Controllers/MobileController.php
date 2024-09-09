@@ -10,6 +10,7 @@ use App\Models\Menu;
 use App\Models\Restaurant;
 use App\Models\Table;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class MobileController extends Controller
 {
@@ -59,22 +60,34 @@ class MobileController extends Controller
         $restaurantId = $member->restaurantId;
         $category = Category::where('restaurantId', $restaurantId)->where('status', '!=', 'Deleted')->get();
         return Util::getResponse($category);
-        }
+    }
 
     public function addToCart(Request $request)
     {
-        try {
-            $tokenData = $request->header('token');
-            $restaurant = Restaurant::where('token', $tokenData)->first();
-            $restaurantId = $restaurant->restaurantId;
-            $cart = new AddToCart();
-            $cart->restaurantId = $restaurantId;
-            $cart->menuId = $request->menuId;
-            $cart->quantity = $request->quantity;
-            $cart->save();
-            return Util::getResponse($cart);
-        } catch (\Throwable $th) {
-            Util::getErrorResponse($th);
+        // Validate the array of cart items
+        $validator = Validator::make($request->all(), [
+            '*.p_id' => 'required|exists:menus,id',
+            '*.qty' => 'required|integer|min:1',
+            '*.table' => 'required|exists:tables,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
         }
+
+        $cartItems = $request->all(); // Since the request is directly an array
+        $addedItems = [];
+
+        foreach ($cartItems as $item) {
+            $addToCart = new AddToCart();
+            $addToCart->menuId = $item['p_id'];
+            $addToCart->tableId = $item['table'];
+            $addToCart->quantity = $item['qty'];
+            $addToCart->save();
+
+            $addedItems[] = $addToCart; // Collect saved items to return later
+        }
+
+        return Util::getResponse($addedItems); // Return the collection of added items
     }
 }
