@@ -32,6 +32,7 @@ class MobileController extends Controller
             Util::getErrorResponse($th);
         }
     }
+    
 
     public function menuList(Request $request)
     {
@@ -48,7 +49,7 @@ class MobileController extends Controller
             $menu = $menu->where('categoryId', $request->category);
         }
         $menu = $menu->where('status', '!=', 'Deleted')->get();
-        // return Util::getResponse($menu);
+        return Util::getResponse($menu);
 
     }
 
@@ -67,11 +68,14 @@ class MobileController extends Controller
             $tokenData = $request->header('token');
             $restaurant = Restaurant::where('token', $tokenData)->first();
             $restaurantId = $restaurant->restaurantId;
+
             $cart = new AddToCart();
             $cart->restaurantId = $restaurantId;
             $cart->menuId = $request->menuId;
             $cart->quantity = $request->quantity;
             $cart->save();
+            
+
             return Util::getResponse($cart);
         } catch (\Throwable $th) {
             Util::getErrorResponse($th);

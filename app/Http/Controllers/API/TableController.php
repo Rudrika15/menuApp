@@ -47,13 +47,7 @@ class TableController extends Controller
             Util::getErrorResponse($th);
         }
     }
-    public function tableList(Request $request)
-    {
-        $tokenData = $request->header('token');
-        $search = $request->search;
-        $member = Member::where('token', $tokenData)->first();
-        $restaurantId = $member->restaurantId;
-    }
+ 
 
     public function addTables(Request $request)
     {
