@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Menu;
 use App\Models\OrderDetail;
 use App\Models\OrderMaster;
 use App\Models\Restaurant;
+use App\Models\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Yajra\DataTables\DataTables;
@@ -91,8 +93,19 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function addorderindex(Request $request)
     {
-        //
+        $restaurantId = Session::get('id');
+        $menu = Menu::where('restaurantId',$restaurantId)->get();
+        $table = Table::where('restaurantId',$restaurantId)
+        ->get();
+        
+        return view('order.addorder', compact('menu', 'table')) ->with('i', (request()->input('page', 1) - 1) * 5);
+
     }
+
+    public function generateorder(Request $request){
+        return $request;
+    }
+
 }

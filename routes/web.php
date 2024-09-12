@@ -76,7 +76,10 @@ Route::group(['middleware' => ['ValidUser']], function () {
     Route::get('orderindex',[OrderController::class,'index'])->name('order.index');
     Route::get('orderdetail',[OrderController::class,'create'])->name('orderdetail.create');
     Route::get('orderbill/{id}',[OrderController::class,'printorder'])->name('orderbill.printorder'); 
-    Route::get('oldorderindex',[OrderController::class,'oldorderindex'])->name('oldorder.index');   
+    Route::get('oldorderindex',[OrderController::class,'oldorderindex'])->name('oldorder.index');
+    Route::get('addorder',[OrderController::class,'addorderindex'])->name('add.order');
+    Route::post('generateorder',[OrderController::class,'generateorder'])->name('order.generate');
+
     Route::get('/profileedit', [RegisterController::class, 'edit'])->name('profile.edit');
     Route::post('/profileupdate', [RegisterController::class, 'update'])->name('profile.update');
 

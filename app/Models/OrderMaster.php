@@ -12,4 +12,9 @@ class OrderMaster extends Model
     public function table(){
         return $this->belongsTo(Table::class,'tableId');
     }
+
+    public function orderdetail(){
+        return $this->hasMany(OrderDetail::class,'orderId','id');
+    }
+
 }

@@ -16,7 +16,11 @@ class Table extends Model
     }
 
     public function oredermaster(){
-        return $this->hasMany(OrderMaster::class,'id');
+        return $this->hasMany(OrderMaster::class,'tableId','id');
     }
+    // protected $appends = ['order_detail'];
 
+    // public function getOrderDetailAttribute(){
+    //     return  OrderMaster::where('tableId',$this->attributes['id'])->with('orderdetail')->get();
+    // }
 }

@@ -13,4 +13,5 @@ class OrderDetail extends Model
         return $this->belongsTo(Menu::class,'menuId');
     }
 
+    
 }
