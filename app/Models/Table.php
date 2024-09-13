@@ -18,6 +18,11 @@ class Table extends Model
     public function oredermaster(){
         return $this->hasMany(OrderMaster::class,'tableId','id');
     }
+
+    public function addtocart(){
+        return $this->hasMany(AddToCart::class,'tableId','id');
+    }
+
     // protected $appends = ['order_detail'];
 
     // public function getOrderDetailAttribute(){

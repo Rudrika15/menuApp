@@ -34,7 +34,7 @@
                     return meta.row + 1;
                 }
             },
-            {data: 'tableId', name: 'tableId',orderable: false},
+            {data: 'tableNumber', name: 'tableNumber',orderable: false},
             {data: 'name', name: 'name',orderable: false},
             {data: 'contactNumber', name: 'contactNumber',orderable: false},
             {data: 'date', name: 'date',orderable: false},
