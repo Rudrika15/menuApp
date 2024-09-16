@@ -60,7 +60,8 @@ class OrderController extends Controller
     public function printorder(Request $request,$orderId)
     {
         $order = OrderMaster::findOrFail($orderId);
-        
+        $order->status = "Inactive";
+        $order->save();
         $orderDetails = OrderDetail::with('menu')
             ->where('orderId', $orderId)
             ->get();
