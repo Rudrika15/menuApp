@@ -41,6 +41,10 @@ Route::middleware('auth.member')->group(function () {
     // Route::get('/addToCart', [MobileController::class, 'addToCart']);
     Route::post('/addToCart', [MobileController::class, 'addToCart']);
     Route::post('/changeTableStatus', [MobileController::class, 'changeTableStatus']);
+    Route::post('/viewCart', [MobileController::class, 'viewCart']);
+    Route::post('/deleteCart', [MobileController::class, 'deleteCart']);
+    Route::post('/changeCart', [MobileController::class, 'changeCart']);
+    Route::get('/orderView', [MobileController::class, 'orderView']);
 });
 Route::middleware('auth.restaurant')->group(function () {
 

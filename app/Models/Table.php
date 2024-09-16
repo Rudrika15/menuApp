@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Table extends Model
 {
     use HasFactory;
+    public function getOrderItem()
+    {
+        return $this->hasMany(AddToCart::class, 'tableId', 'id');
+    }
 }
