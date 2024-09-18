@@ -85,6 +85,9 @@ Route::group(['middleware' => ['ValidUser']], function () {
     Route::get('/profileedit', [RegisterController::class, 'edit'])->name('profile.edit');
     Route::post('/profileupdate', [RegisterController::class, 'update'])->name('profile.update');
 
+    Route::get('/export',[StaffController::class,'export'])->name('export');
+    Route::post('/import',[StaffController::class,'import'])->name('import');
 
+    Route::get('/send-email',[StaffController::class,'sendemail'])->name('email.send');
 });
     

@@ -13,6 +13,16 @@ class Staff extends Model
 
     protected $table = 'staff';
 
+    protected $fillable = [
+
+        'restaurantId',
+        'name',
+        'contactNumber',
+        'email',
+        'password',
+        'staffType',
+        'status',
+    ];
     public function restaurant(){
         return $this->belongsTo(Restaurant::class,'restaurantId','id');
     }

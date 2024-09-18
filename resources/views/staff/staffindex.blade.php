@@ -13,6 +13,13 @@
 
 <table class="table table-bordered text-center bg-white">
     <tr>
+        <th colspan="7">
+            <div class="d-flex justify-content-end">
+            <a href="{{route('export')}}" class="btn btn-sm btn-primary"><i class="fa fa-file"></i>  Export</a>
+            </div>
+        </th>
+    </tr>
+    <tr>
         <th>No</th>
         <th>Name</th>
         <th>ContactNumber</th>
