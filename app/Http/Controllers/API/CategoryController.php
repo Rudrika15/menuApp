@@ -127,33 +127,41 @@ class CategoryController extends Controller
         $tokenData = $request->header('token');
         $restaurant = Restaurant::where('token', $tokenData)->first();
         $restaurantId = $restaurant->id;
-        $rules = [
-            'title' => 'required',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $firstError = $errors->first();
-
-            return response()->json(['status' => false, 'message' => $firstError], 200);
+      try
+      {
+        $category = Category::where('id', $id)->where('restaurantId', $restaurantId)->first();
+        if (!$category) {
+            return Util::getErrorResponse("Category not found");
         }
-        try {
-            $category = Category::find($id);
-            if (!$category) {
-                return Util::getErrorResponse("Category not found");
-            }
-            $category->title = $request->title;
-            if ($request->photo) {
-                $category->photo = time() . '.' . $request->photo->extension();
-                $request->photo->move(public_path('categoryPhoto'), $category->photo);
-            }
-            $category->save();
-            return Util::postResponse($category, "categoryPhoto/" . $category->photo);
-        } catch (\Throwable $th) {
-            Util::getErrorResponse($th);
+        $category->title = $request->title
+        ;
+        if ($request->photo) {
+            $category->photo = time() . '.' . $request->photo->extension();
+            $request->photo->move(public_path('categoryPhoto'), $category->photo);
         }
+        $category->save();
+        return Util::postResponse($category, "categoryPhoto/" . $category->photo);
+      }
+      catch (\Throwable $th)
+      {
+        Util::getErrorResponse($th);
+      }
+        
+        // try {
+        //     $category = Category::find($id);
+        //     if (!$category) {
+        //         return Util::getErrorResponse("Category not found");
+        //     }
+        //     $category->title = $request->title;
+        //     if ($request->photo) {
+        //         $category->photo = time() . '.' . $request->photo->extension();
+        //         $request->photo->move(public_path('categoryPhoto'), $category->photo);
+        //     }
+        //     $category->save();
+        //     return Util::postResponse($category, "categoryPhoto/" . $category->photo);
+        // } catch (\Throwable $th) {
+        //     Util::getErrorResponse($th);
+        // }
     }
 
     public function deleteCategories(Request $request, $id)

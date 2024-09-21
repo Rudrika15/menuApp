@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ItemAddedToCart;
 use App\Helpers\Util;
 use App\Models\AddToCart;
 use App\Models\Category;
@@ -12,6 +13,7 @@ use App\Models\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class MobileController extends Controller
 {
@@ -87,37 +89,59 @@ class MobileController extends Controller
         return Util::getResponse($category);
     }
 
-    public function addToCart(Request $request)
-    {
 
-        $validator = Validator::make($request->all(), [
-            '*.p_id' => 'required|exists:menus,id',
-            '*.qty' => 'required|integer|min:1',
-            '*.table' => 'required|exists:tables,id',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-        $token = $request->header('token');
-        $member = Member::where('token', $token)->first();
-        $restaurantId = $member->restaurantId;
-        $cartItems = $request->all();
-        $addedItems = [];
+public function addToCart(Request $request)
+{
+    // Validate the incoming request
+    $validator = Validator::make($request->all(), [
+        '*.p_id' => 'required|exists:menus,id',
+        '*.qty' => 'required|integer|min:1',
+        '*.table' => 'required|exists:tables,id',
+    ]);
 
-        foreach ($cartItems as $item) {
-            $addToCart = new AddToCart();
-            $addToCart->menuId = $item['p_id'];
-            $addToCart->tableId = $item['table'];
-            $addToCart->qty = $item['qty'];
-            $addToCart->restaurantId = $restaurantId;
-            $addToCart->save();
-
-            $addedItems[] = $addToCart;
-        }
-
-        return Util::getResponse($addedItems);
+    // Return validation errors if they exist
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 400);
     }
+
+    // Retrieve the member based on the provided token
+    $token = $request->header('token');
+    $member = Member::where('token', $token)->first();
+    $restaurantId = $member->restaurantId;
+
+    $cartItems = $request->all();
+    $addedItems = [];
+
+    // Loop through each item and add to the cart
+    foreach ($cartItems as $item) {
+        $addToCart = new AddToCart();
+        $addToCart->menuId = $item['p_id'];
+        $addToCart->tableId = $item['table'];
+        $addToCart->qty = $item['qty'];
+        $addToCart->restaurantId = $restaurantId;
+        $addToCart->save();
+
+        $addedItems[] = $addToCart;
+    }
+
+    // Log added items for debugging
+    Log::info('Items added to cart:', [
+        'addedItems' => $addedItems,
+        'restaurantId' => $restaurantId,
+    ]);
+
+    // Trigger the event
+    event(new ItemAddedToCart($addedItems));
+
+    // Log event broadcast confirmation
+    Log::info('Event ItemAddedToCart broadcasted', [
+        'addedItemsCount' => count($addedItems),
+    ]);
+
+    return Util::getResponse('Item added');
+}
+
     public function viewCart(Request $request)
     {
         $tableId = $request->table_id;

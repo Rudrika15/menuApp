@@ -77,7 +77,7 @@ Route::middleware('auth.restaurant')->group(function () {
     Route::get('/categories', [CategoryController::class, 'getCategories']);
     Route::get('/category/byId/{id?}', [CategoryController::class, 'getCategoryById']);
     Route::post('/categories', [CategoryController::class, 'addCategories']);
-    Route::put('/category/{id?}', [CategoryController::class, 'editCategories']);
+    Route::POST('/category/{id?}', [CategoryController::class, 'editCategories']);
     Route::delete('/category/{id?}', [CategoryController::class, 'deleteCategories']);
     // trash
     Route::get('/trashCategories', [CategoryController::class, 'getTrashCategories']);
@@ -86,10 +86,13 @@ Route::middleware('auth.restaurant')->group(function () {
 
     // menu api
     Route::get('/menu', [MenuController::class, 'getMenus']);
-    // Route::post('/menu', [MenuController::class, 'addMenu']);
-    // Route::put('/menu/edit/{id?}', [MenuController::class, 'editMenu']);
-    // Route::delete('/menu/delete/{id?}', [MenuController::class, 'deleteMenu']);
+    Route::post('/menu', [MenuController::class, 'addMenu']);
+    Route::post('/menu/edit/{id?}', [MenuController::class, 'editMenu']);
     // trash
+    Route::get('/trashMenu', [MenuController::class, 'getTrashMenus']);
+    Route::put('/menu/restore/{id?}', [MenuController::class, 'restoreDeletedMenu']);
+    Route::delete('/menu/delete/{id?}', [MenuController::class, 'permanentDeleteMenu']);
+    Route::get('/menu/byId/{id?}', [MenuController::class, 'showMenu']);
     Route::get('/trashMenu', [MenuController::class, 'getTrashMenus']);
 });
 
