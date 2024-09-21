@@ -218,7 +218,8 @@ class MobileController extends Controller
             )
             ->join('menus', 'add_to_carts.menuId', '=', 'menus.id')
             ->join('tables', 'add_to_carts.tableId', '=', 'tables.id')
-            ->where('add_to_carts.status', '=', 'Pending')
+            // ->where('add_to_carts.status', '=', 'Pending')
+
             ->groupBy('tables.tableNumber', 'add_to_carts.tableId', 'add_to_carts.status', 'menus.title', 'add_to_carts.menuId')  // Group by menuId as well
             ->orderBy('add_to_carts.tableId', 'asc')
             ->get();
@@ -283,7 +284,7 @@ class MobileController extends Controller
         $tableId = $request->tableId;
         $productId = $request->productId;
 
-        if (isset($tableId)  && isset($productId)) {
+        if (isset($tableId)  && isset($productId) && $request->status == true) {
             $cartData = AddToCart::where('tableId', $tableId)
                 ->where('menuId', $productId)
                 ->where('restaurantId', $restaurantId)
@@ -292,12 +293,29 @@ class MobileController extends Controller
                 $cart->status = 'Done';
                 $cart->save();
             }
-        } else if (isset($productId)) {
+        } else if (isset($tableId)  && isset($productId) && $request->status == false) {
+            $cartData = AddToCart::where('tableId', $tableId)
+                ->where('menuId', $productId)
+                ->where('restaurantId', $restaurantId)
+                ->get();
+            foreach ($cartData as $cart) {
+                $cart->status = 'Pending';
+                $cart->save();
+            }
+        } else if (isset($productId) && $request->status == true) {
             $cartData = AddToCart::where('menuId', $productId)
                 ->where('restaurantId', $restaurantId)
                 ->get();
             foreach ($cartData as $cart) {
                 $cart->status = 'Done';
+                $cart->save();
+            }
+        } else if (isset($productId) && $request->status == false) {
+            $cartData = AddToCart::where('menuId', $productId)
+                ->where('restaurantId', $restaurantId)
+                ->get();
+            foreach ($cartData as $cart) {
+                $cart->status = 'Pending';
                 $cart->save();
             }
         }
