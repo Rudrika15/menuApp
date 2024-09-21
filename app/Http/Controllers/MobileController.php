@@ -214,7 +214,8 @@ class MobileController extends Controller
                 DB::raw('COUNT(add_to_carts.id) as total_orders'),
                 DB::raw('SUM(add_to_carts.qty) as qty'),
                 'add_to_carts.status',
-                'menus.title'
+                'menus.title',
+                'menus.id'
             )
             ->join('menus', 'add_to_carts.menuId', '=', 'menus.id')
             ->join('tables', 'add_to_carts.tableId', '=', 'tables.id')
