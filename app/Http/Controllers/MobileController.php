@@ -202,25 +202,24 @@ class MobileController extends Controller
     }
     public function orderView(Request $request)
     {
-
         $token = $request->header('token');
         $member = Member::where('token', $token)->first();
         $restaurantId = $member->restaurantId;
 
         $cartData1 = DB::table('add_to_carts')
-            ->select(
-                'tables.tableNumber',
-                'add_to_carts.tableId',
-                DB::raw('COUNT(add_to_carts.id) as total_orders'),
-                DB::raw('SUM(add_to_carts.qty) as qty'),
-                'add_to_carts.status',
-                'menus.title',
-                'menus.id'
-            )
+        ->select(
+            'tables.tableNumber',
+            'add_to_carts.tableId',
+            'add_to_carts.menuId',  // Add menuId to the select clause
+            DB::raw('COUNT(add_to_carts.id) as total_orders'),
+            DB::raw('SUM(add_to_carts.qty) as qty'),
+            'add_to_carts.status',
+            'menus.title'
+        )
             ->join('menus', 'add_to_carts.menuId', '=', 'menus.id')
             ->join('tables', 'add_to_carts.tableId', '=', 'tables.id')
             ->where('add_to_carts.status', '=', 'Pending')
-            ->groupBy('tables.tableNumber', 'add_to_carts.tableId', 'add_to_carts.status', 'menus.title')
+            ->groupBy('tables.tableNumber', 'add_to_carts.tableId', 'add_to_carts.status', 'menus.title', 'add_to_carts.menuId')  // Group by menuId as well
             ->orderBy('add_to_carts.tableId', 'asc')
             ->get();
 
@@ -238,9 +237,9 @@ class MobileController extends Controller
                     "getMenu" => []
                 ];
             }
-
-            // Add menu details to 'getMenu'
+            // Add menu details to 'getMenu', including menuId
             $responseData[$tableId]['getMenu'][] = [
+                'menuId' => $cart->menuId,  // Add the menuId here
                 'total_orders' => $cart->total_orders,
                 'qty' => $cart->qty,
                 'status' => $cart->status,
@@ -250,9 +249,9 @@ class MobileController extends Controller
 
         if ($request->has('summary')) {
             $cartData = DB::table('menus')
-                ->join('add_to_carts', 'menus.id', '=', 'add_to_carts.menuId')
-                ->select('menus.title', 'menus.price', 'menus.photo', DB::raw('SUM(add_to_carts.qty) as qty'))
-                ->where('add_to_carts.restaurantId', '=', $restaurantId)
+            ->join('add_to_carts', 'menus.id', '=', 'add_to_carts.menuId')
+            ->select('menus.title', 'menus.price', 'menus.photo', DB::raw('SUM(add_to_carts.qty) as qty'))
+            ->where('add_to_carts.restaurantId', '=', $restaurantId)
                 ->groupBy('menus.id', 'menus.title', 'menus.price', 'menus.photo')
                 ->get();
             return Util::getResponse([
@@ -264,6 +263,7 @@ class MobileController extends Controller
             'cartData' => array_values($responseData)
         ]);
     }
+
 
     public function updateTableStatus(Request $request)
     {
