@@ -45,6 +45,7 @@ Route::middleware('auth.member')->group(function () {
     Route::post('/deleteCart', [MobileController::class, 'deleteCart']);
     Route::post('/changeCart', [MobileController::class, 'changeCart']);
     Route::get('/orderView', [MobileController::class, 'orderView']);
+    Route::put('/update/table/status', [MobileController::class, 'updateTableStatus']);
 });
 Route::middleware('auth.restaurant')->group(function () {
 

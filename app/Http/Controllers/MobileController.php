@@ -267,27 +267,36 @@ class MobileController extends Controller
     public function updateTableStatus(Request $request)
     {
 
+        $tokenData = $request->header('token');
+        $search = $request->search;
+        $member = Member::where('token', $tokenData)->first();
+        $restaurantId = $member->restaurantId;
+
         $tableId = $request->tableId;
         $productId = $request->productId;
 
-        if ($tableId == true && $productId == true) {
+        if (isset($tableId)  && isset($productId)) {
             $cartData = AddToCart::where('tableId', $tableId)
-                ->where('menuId', $productId)->get();
+                ->where('menuId', $productId)
+                ->where('restaurantId', $restaurantId)
+                ->get();
+            foreach ($cartData as $cart) {
+                $cart->status = 'Done';
+                $cart->save();
+            }
+        } else if (isset($productId)) {
+            $cartData = AddToCart::where('menuId', $productId)
+                ->where('restaurantId', $restaurantId)
+                ->get();
             foreach ($cartData as $cart) {
                 $cart->status = 'Done';
                 $cart->save();
             }
         }
 
-
-        if ($productId == true) {
-            $cartData = AddToCart::where('menuId', $productId)->get();
-            foreach ($cartData as $cart) {
-                $cart->status = 'Done';
-                $cart->save();
-            }
-        }
-
-        return Util::getErrorResponse('Status updated successfully');
+        return response()->json([
+            'status' => true,
+            'message' => "Status updated successfully"
+        ], 200);
     }
 }
