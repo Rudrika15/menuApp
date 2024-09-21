@@ -113,7 +113,7 @@ class MenuController extends Controller
         $menu = $menu->get();
         return Util::getResponse($menu);
     }
-    public function restoreMenu(Request $request, $id)
+    public function restoreDeletedMenu(Request $request, $id)
     {
         $menu = Menu::find($id);
         if (!$menu) {
@@ -129,6 +129,16 @@ class MenuController extends Controller
         if (!$menu) {
             return Util::getErrorResponse("Menu not found");
         }
+        return Util::getResponse($menu);
+    }
+
+    public function permanentDeleteMenu(Request $request, $id)
+    {
+        $menu = Menu::find($id);
+        if (!$menu) {
+            return Util::getErrorResponse("Menu not found");
+        }
+        $menu->delete();
         return Util::getResponse($menu);
     }
 }
