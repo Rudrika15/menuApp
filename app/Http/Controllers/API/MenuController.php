@@ -32,12 +32,13 @@ class MenuController extends Controller
         $tokenData = $request->header('token');
 
         $restaurant = Restaurant::where('token', $tokenData)->first();
-        $restaurantId = $restaurant->restaurantId;
+        $restaurantId = $restaurant->id;
 
         $rules = [
             'categoryId' => 'required',
             'title' => 'required',
             'price' => 'required',
+            'photo' => 'required',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -53,18 +54,29 @@ class MenuController extends Controller
         $menu->categoryId = $request->categoryId;
         $menu->title = $request->title;
         $menu->price = $request->price;
-        if ($request->photo) {
-            $menu->photo = time() . '.' . $request->photo->extension();
-            $request->photo->move(public_path('menuPhoto'), $menu->photo);
-        }
+        $menu->photo = time() . '.' . $request->photo->extension();
+        $request->photo->move(public_path('menuPhoto'), $menu->photo);
         $menu->save();
-        return Util::getResponse($menu);
+        return Util::postResponse($menu, "menuPhoto/" . $menu->photo);
     }
     public function editMenu(Request $request, $id)
     {
         $tokenData = $request->header('token');
         $restaurant = Restaurant::where('token', $tokenData)->first();
         $restaurantId = $restaurant->id;
+        $rules = [
+            'categoryId' => 'required',
+            'title' => 'required',
+            'price' => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $firstError = $errors->first();
+
+            return response()->json(['status' => false, 'message' => $firstError], 200);
+        }
         $menu = Menu::where('id', $id)->where('restaurantId', $restaurantId)->first();
         if (!$menu) {
             return Util::getErrorResponse("Menu not found");
@@ -77,7 +89,7 @@ class MenuController extends Controller
             $request->photo->move(public_path('menuPhoto'), $menu->photo);
         }
         $menu->save();
-        return Util::postResponse($menu);
+        return Util::postResponse($menu, "menuPhoto" . $menu->photo);
     }
     public function deleteMenu(Request $request, $id)
     {
