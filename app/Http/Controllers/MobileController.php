@@ -91,56 +91,56 @@ class MobileController extends Controller
 
 
 
-public function addToCart(Request $request)
-{
-    // Validate the incoming request
-    $validator = Validator::make($request->all(), [
-        '*.p_id' => 'required|exists:menus,id',
-        '*.qty' => 'required|integer|min:1',
-        '*.table' => 'required|exists:tables,id',
-    ]);
+    public function addToCart(Request $request)
+    {
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            '*.p_id' => 'required|exists:menus,id',
+            '*.qty' => 'required|integer|min:1',
+            '*.table' => 'required|exists:tables,id',
+        ]);
 
-    // Return validation errors if they exist
-    if ($validator->fails()) {
-        return response()->json($validator->errors(), 400);
+        // Return validation errors if they exist
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        // Retrieve the member based on the provided token
+        $token = $request->header('token');
+        $member = Member::where('token', $token)->first();
+        $restaurantId = $member->restaurantId;
+
+        $cartItems = $request->all();
+        $addedItems = [];
+
+        // Loop through each item and add to the cart
+        foreach ($cartItems as $item) {
+            $addToCart = new AddToCart();
+            $addToCart->menuId = $item['p_id'];
+            $addToCart->tableId = $item['table'];
+            $addToCart->qty = $item['qty'];
+            $addToCart->restaurantId = $restaurantId;
+            $addToCart->save();
+
+            $addedItems[] = $addToCart;
+        }
+
+        // Log added items for debugging
+        Log::info('Items added to cart:', [
+            'addedItems' => $addedItems,
+            'restaurantId' => $restaurantId,
+        ]);
+
+        // Trigger the event
+        event(new ItemAddedToCart($addedItems));
+
+        // Log event broadcast confirmation
+        Log::info('Event ItemAddedToCart broadcasted', [
+            'addedItemsCount' => count($addedItems),
+        ]);
+
+        return Util::getResponse('Item added');
     }
-
-    // Retrieve the member based on the provided token
-    $token = $request->header('token');
-    $member = Member::where('token', $token)->first();
-    $restaurantId = $member->restaurantId;
-
-    $cartItems = $request->all();
-    $addedItems = [];
-
-    // Loop through each item and add to the cart
-    foreach ($cartItems as $item) {
-        $addToCart = new AddToCart();
-        $addToCart->menuId = $item['p_id'];
-        $addToCart->tableId = $item['table'];
-        $addToCart->qty = $item['qty'];
-        $addToCart->restaurantId = $restaurantId;
-        $addToCart->save();
-
-        $addedItems[] = $addToCart;
-    }
-
-    // Log added items for debugging
-    Log::info('Items added to cart:', [
-        'addedItems' => $addedItems,
-        'restaurantId' => $restaurantId,
-    ]);
-
-    // Trigger the event
-    event(new ItemAddedToCart($addedItems));
-
-    // Log event broadcast confirmation
-    Log::info('Event ItemAddedToCart broadcasted', [
-        'addedItemsCount' => count($addedItems),
-    ]);
-
-    return Util::getResponse('Item added');
-}
 
     public function viewCart(Request $request)
     {
@@ -247,11 +247,6 @@ public function addToCart(Request $request)
             ];
         }
 
-        
-
-
-
-
         if ($request->has('summary')) {
             $cartData = DB::table('menus')
                 ->join('add_to_carts', 'menus.id', '=', 'add_to_carts.menuId')
@@ -265,7 +260,34 @@ public function addToCart(Request $request)
         }
 
         return Util::getResponse([
-            'cartData' => array_values($responseData) 
+            'cartData' => array_values($responseData)
         ]);
+    }
+
+    public function updateTableStatus(Request $request)
+    {
+
+        $tableId = $request->tableId;
+        $productId = $request->productId;
+
+        if ($tableId == true && $productId == true) {
+            $cartData = AddToCart::where('tableId', $tableId)
+                ->where('menuId', $productId)->get();
+            foreach ($cartData as $cart) {
+                $cart->status = 'Done';
+                $cart->save();
+            }
+        }
+
+
+        if ($productId == true) {
+            $cartData = AddToCart::where('menuId', $productId)->get();
+            foreach ($cartData as $cart) {
+                $cart->status = 'Done';
+                $cart->save();
+            }
+        }
+
+        return Util::getErrorResponse('Status updated successfully');
     }
 }
