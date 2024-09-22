@@ -252,15 +252,17 @@ class MobileController extends Controller
             $cartData = DB::table('menus')
                 ->join('add_to_carts', 'menus.id', '=', 'add_to_carts.menuId')
                 ->select(
-                    'menus.id as menuId',  // Select the menuId
+                    'menus.id as menuId',         // Add menuId here
                     'menus.title',
                     'menus.price',
                     'menus.photo',
+                    'add_to_carts.status',        // Add status here
                     DB::raw('SUM(add_to_carts.qty) as qty')
                 )
                 ->where('add_to_carts.restaurantId', '=', $restaurantId)
-                ->groupBy('menus.id', 'menus.title', 'menus.price', 'menus.photo')  // Group by menus.id (menuId)
+                ->groupBy('menus.id', 'menus.title', 'menus.price', 'menus.photo', 'add_to_carts.status')  // Group by menuId and status
                 ->get();
+
             return Util::getResponse([
                 'cartData' => $cartData,
             ]);
