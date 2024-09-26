@@ -46,6 +46,10 @@ Route::middleware('auth.member')->group(function () {
     Route::post('/changeCart', [MobileController::class, 'changeCart']);
     Route::get('/orderView', [MobileController::class, 'orderView']);
     Route::put('/update/table/status', [MobileController::class, 'updateTableStatus']);
+    Route::post('/person', [MobileController::class, 'addPerson']);
+    Route::get('/person', [MobileController::class, 'personList']);
+    Route::delete('/person/{id?}', [MobileController::class, 'deletePerson']);
+    Route::post('/changeSequence', [MobileController::class, 'changeSequence']);
 });
 Route::middleware('auth.restaurant')->group(function () {
 
@@ -98,3 +102,5 @@ Route::middleware('auth.restaurant')->group(function () {
 });
 
 Route::get('/pass', [CategoryController::class, 'addPassword']);
+Route::post('/genrateBill', [MobileController::class, 'genrateBill']);
+Route::get('/bills', [MobileController::class, 'bills']);

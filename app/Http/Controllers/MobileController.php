@@ -8,8 +8,11 @@ use App\Models\AddToCart;
 use App\Models\Category;
 use App\Models\Member;
 use App\Models\Menu;
+use App\Models\OrderDetail;
+use App\Models\OrderMaster;
 use App\Models\Restaurant;
 use App\Models\Table;
+use App\Models\Waiting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -210,24 +213,24 @@ class MobileController extends Controller
             ->select(
                 'tables.tableNumber',
                 'add_to_carts.tableId',
-                'add_to_carts.menuId',  // Add menuId to the select clause
+                'add_to_carts.menuId',
                 DB::raw('COUNT(add_to_carts.id) as total_orders'),
                 DB::raw('SUM(add_to_carts.qty) as qty'),
                 'add_to_carts.status',
-                'menus.title'
+                'menus.title',
+                'add_to_carts.created_at'  // Include created_at here
             )
             ->join('menus', 'add_to_carts.menuId', '=', 'menus.id')
             ->join('tables', 'add_to_carts.tableId', '=', 'tables.id')
+            // Uncomment if you need to filter by status
             // ->where('add_to_carts.status', '=', 'Pending')
-
-            ->groupBy('tables.tableNumber', 'add_to_carts.tableId', 'add_to_carts.status', 'menus.title', 'add_to_carts.menuId')  // Group by menuId as well
+            ->groupBy('tables.tableNumber', 'add_to_carts.tableId', 'add_to_carts.status', 'menus.title', 'add_to_carts.menuId', 'add_to_carts.created_at')  // Group by created_at as well
             ->orderBy('add_to_carts.tableId', 'asc')
             ->get();
 
         // Transform data into the required nested structure
         $responseData = [];
         foreach ($cartData1 as $cart) {
-            // Group by tableId
             $tableId = $cart->tableId;
 
             // Initialize table if not exists
@@ -238,13 +241,14 @@ class MobileController extends Controller
                     "getMenu" => []
                 ];
             }
-            // Add menu details to 'getMenu', including menuId
+            // Add menu details to 'getMenu', including created_at
             $responseData[$tableId]['getMenu'][] = [
-                'menuId' => $cart->menuId,  // Add the menuId here
+                'menuId' => $cart->menuId,
                 'total_orders' => $cart->total_orders,
                 'qty' => $cart->qty,
                 'status' => $cart->status,
-                'title' => $cart->title
+                'title' => $cart->title,
+                'created_at' => $cart->created_at  // Include created_at here
             ];
         }
 
@@ -252,15 +256,16 @@ class MobileController extends Controller
             $cartData = DB::table('menus')
                 ->join('add_to_carts', 'menus.id', '=', 'add_to_carts.menuId')
                 ->select(
-                    'menus.id as menuId',         // Add menuId here
+                    'menus.id as menuId',
                     'menus.title',
                     'menus.price',
                     'menus.photo',
-                    'add_to_carts.status',        // Add status here
-                    DB::raw('SUM(add_to_carts.qty) as qty')
+                    'add_to_carts.status',
+                    DB::raw('SUM(add_to_carts.qty) as qty'),
+                    'add_to_carts.created_at'  // Include created_at here
                 )
                 ->where('add_to_carts.restaurantId', '=', $restaurantId)
-                ->groupBy('menus.id', 'menus.title', 'menus.price', 'menus.photo', 'add_to_carts.status')  // Group by menuId and status
+                ->groupBy('menus.id', 'menus.title', 'menus.price', 'menus.photo', 'add_to_carts.status', 'add_to_carts.created_at')  // Group by created_at as well
                 ->get();
 
             return Util::getResponse([
@@ -326,5 +331,149 @@ class MobileController extends Controller
             'status' => true,
             'message' => "Status updated successfully"
         ], 200);
+    }
+    public function genrateBill(Request $request)
+    {
+        $request->validate([
+            'tableId' => 'required',
+        ]);
+
+        $name =  $request->name;
+        $contactNumber = $request->contactNumber;
+        $gst = $request->gst;
+
+        $tableId = $request->tableId;
+
+
+        $cartData = AddToCart::where('tableId', $tableId)
+            ->get();
+        $orderMaster = new OrderMaster();
+        $orderMaster->name = $name;
+        $orderMaster->tableId = $tableId;
+        $orderMaster->contactNumber = $contactNumber;
+        $orderMaster->gst = $gst;
+        $orderMaster->save();
+
+
+        foreach ($cartData as $cart) {
+            $orderDetail = new OrderDetail();
+            $orderDetail->orderId = $orderMaster->id;
+            $orderDetail->menuId = $cart->menuId;
+            $orderDetail->qty = $cart->qty;
+            $orderDetail->save();
+        }
+        $deleteCart =  AddToCart::where('tableId', $tableId);
+        $deleteCart->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Bill generated successfully",
+            'data' => $orderMaster
+        ], 200);
+    }
+
+    public function bills(Request $request)
+    {
+        $token = $request->header('token');
+        $member = Member::where('token', $token)->first();
+        $restaurantId = $member->restaurantId;
+
+        $table = Table::with('getOrders.orderDetails')->whereHas('getOrders.orderDetails')
+            ->where('restaurantId', $restaurantId)
+            ->get();
+
+        return Util::getResponse($table);
+    }
+    public function addPerson(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'noOfPerson' => 'required',
+        ]);
+
+
+
+        $token = $request->header('token');
+        $member = Member::where('token', $token)->first();
+        $restaurantId = $member->restaurantId;
+        $sequence = Waiting::where('restaurantId', $restaurantId)->get();
+
+        if (count($sequence) > 0) {
+            $sequence = $sequence->last()->sequence + 1;
+        } else {
+            $sequence = 1;
+        }
+
+        $data =  new Waiting();
+
+        $data->name = $request->name;
+        $data->noOfPerson = $request->noOfPerson;
+        $data->restaurantId = $restaurantId;
+        $data->sequence = $sequence;
+        $data->save();
+        return Util::postResponse($data);
+    }
+    public function personList(Request $request)
+    {
+        $token = $request->header('token');
+        $member = Member::where('token', $token)->first();
+        $restaurantId = $member->restaurantId;
+        $data =  Waiting::where('restaurantId', $restaurantId)->orderBy('sequence', 'asc')->get();
+        return Util::getResponse($data);
+    }
+    public function deletePerson(Request $request, $id)
+    {
+        $token = $request->header('token');
+        $member = Member::where('token', $token)->first();
+        $restaurantId = $member->restaurantId;
+        $data =  Waiting::where('id', $id)->where('restaurantId', $restaurantId)->delete();
+        return Util::getResponse($data);
+    }
+    public function changeSequence(Request $request)
+    {
+        // Get the token from the header and find the member
+        $token = $request->header('token');
+        $member = Member::where('token', $token)->first();
+        $restaurantId = $member->restaurantId;
+
+        // Find the target item
+
+        $targetWaiting = Waiting::where('id', $request->id)
+            ->where('restaurantId', $restaurantId)
+            ->first();
+
+        // Check if the item exists
+        if (!$targetWaiting) {
+            return Util::getResponse(null, 'Item not found', 404);
+        }
+
+        // Get the old and new sequence values
+        $oldSequence = $targetWaiting->sequence;
+        $newSequence = $request->sequence;
+
+        // If the sequence is being updated to the same value, return early
+        if ($oldSequence == $newSequence) {
+            return Util::getResponse($targetWaiting, 'Sequence unchanged');
+        }
+
+        // If the new sequence is greater, decrement the sequence of items between old and new sequence
+        if ($oldSequence <= $newSequence) {
+            Waiting::where('restaurantId', $restaurantId)
+                ->whereBetween('sequence', [$oldSequence + 1, $newSequence])
+                ->decrement('sequence');
+        }
+        // If the new sequence is smaller, increment the sequence of items between old and new sequence
+        elseif ($oldSequence >= $newSequence) {
+            Waiting::where('restaurantId', $restaurantId)
+                ->whereBetween('sequence', [$newSequence, $oldSequence - 1])
+                ->increment('sequence');
+        }
+
+        // Update the sequence of the target item
+        $targetWaiting->update(['sequence' => $newSequence]);
+
+
+        // Return the updated item in the response
+        return Util::getResponse($targetWaiting, 'Sequence updated successfully');
     }
 }
