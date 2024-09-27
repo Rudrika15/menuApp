@@ -5,7 +5,12 @@ namespace App\Http\Controllers\API;
 use App\Helpers\Util;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Member;
+use App\Models\Menu;
+use App\Models\OrderDetail;
+use App\Models\OrderMaster;
 use App\Models\Restaurant;
+use App\Models\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -127,26 +132,22 @@ class CategoryController extends Controller
         $tokenData = $request->header('token');
         $restaurant = Restaurant::where('token', $tokenData)->first();
         $restaurantId = $restaurant->id;
-      try
-      {
-        $category = Category::where('id', $id)->where('restaurantId', $restaurantId)->first();
-        if (!$category) {
-            return Util::getErrorResponse("Category not found");
+        try {
+            $category = Category::where('id', $id)->where('restaurantId', $restaurantId)->first();
+            if (!$category) {
+                return Util::getErrorResponse("Category not found");
+            }
+            $category->title = $request->title;
+            if ($request->photo) {
+                $category->photo = time() . '.' . $request->photo->extension();
+                $request->photo->move(public_path('categoryPhoto'), $category->photo);
+            }
+            $category->save();
+            return Util::postResponse($category, "categoryPhoto/" . $category->photo);
+        } catch (\Throwable $th) {
+            Util::getErrorResponse($th);
         }
-        $category->title = $request->title
-        ;
-        if ($request->photo) {
-            $category->photo = time() . '.' . $request->photo->extension();
-            $request->photo->move(public_path('categoryPhoto'), $category->photo);
-        }
-        $category->save();
-        return Util::postResponse($category, "categoryPhoto/" . $category->photo);
-      }
-      catch (\Throwable $th)
-      {
-        Util::getErrorResponse($th);
-      }
-        
+
         // try {
         //     $category = Category::find($id);
         //     if (!$category) {
@@ -190,5 +191,28 @@ class CategoryController extends Controller
             $restaurant->password = Hash::make('123456');
             $restaurant->save();
         }
+    }
+
+
+
+    public function billCreate(Request $request)
+    {
+        $tokenData = $request->header('token');
+        $restaurant = Member::where('token', $tokenData)->first();
+
+        if (!$restaurant) {
+            return response()->json(['error' => 'Restaurant not found.'], 404);
+        }
+
+        $restaurantId = $restaurant->restaurantId;
+
+        $table = Table::where('restaurantId', $restaurantId)
+            ->whereHas('getOrders')
+            ->with('getOrders.orderDetails.menu')->get([
+                'id',
+                'tableNumber'
+            ]);
+
+        return Util::getResponse($table);
     }
 }

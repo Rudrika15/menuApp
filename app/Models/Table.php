@@ -18,4 +18,5 @@ class Table extends Model
     {
         return $this->hasMany(OrderMaster::class, 'tableId', 'id');
     }
+    
 }

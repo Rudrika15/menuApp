@@ -13,4 +13,9 @@ class OrderMaster extends Model
     {
         return $this->hasMany(OrderDetail::class, 'orderId', 'id');
     }
+
+    public function table()
+    {
+        return $this->belongsTo(Table::class, 'tableId', 'id');
+    }
 }

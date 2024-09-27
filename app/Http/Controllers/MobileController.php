@@ -525,9 +525,25 @@ class MobileController extends Controller
         $token = $request->header('token');
         $member = Member::where('token', $token)->first();
         $restaurantId = $member->restaurantId;
-        $data =  ParcelMaster::where('restaurantId', $restaurantId)->get();
+
+        $data = ParcelMaster::where('restaurantId', $restaurantId)
+            ->with(['parceldetail' => function ($query) {
+                $query->select('menuId', 'parcelmasterId', DB::raw('SUM(qty) as total_qty'));
+            }])
+            ->get();
+
+        foreach ($data as $parcel) {
+            $grandTotal = 0;
+            foreach ($parcel->parceldetail as $detail) {
+                $menuPrice = Menu::where('id', $detail->menuId)->value('price');
+                $grandTotal += $detail->total_qty * $menuPrice;
+            }
+            $parcel->grand_total = $grandTotal;
+        }
+
         return Util::getResponse($data);
     }
+
     public function parcelListDetail($id)
     {
         $data = DB::table('menus')
@@ -540,20 +556,39 @@ class MobileController extends Controller
     }
     public function parcelData(Request $request)
     {
-        $data = DB::table('parcelmasters')
-            ->crossJoin('parceldetail')
-            ->crossJoin('menus')
-            ->select('parcelmasters.name', 'parceldetail.qty', 'parceldetail.status as parceldetailStatus', 'parceldetail.id as paceldetailId', 'menus.*')
-            ->where('menus.id', '=', DB::raw('parceldetail.menuId'))
-            ->where('parcelmasters.id', '=', DB::raw('parceldetail.parcelmasterId'))
-            ->get();
-        return response()->json([
-            'message' => 'Parcel list Successfully with details',
-            'status' => true,
-            'data' => $data
+        $parcelmasters = parcelmaster::all();
+        $results = []; // Initialize an array to hold all parcel data with details
 
+        foreach ($parcelmasters as $value) {
+            $data = DB::table('menus')
+                ->crossJoin('parceldetail')
+                ->select(
+                    'menus.*',
+                    'parceldetail.*',
+                    DB::raw('parceldetail.qty * menus.price AS total_price')
+                )
+                ->where('menus.id', '=', DB::raw('parceldetail.menuId'))
+                ->where('parceldetail.parcelmasterId', '=', $value->id)
+                ->get();
+
+            // Calculate grand total for the current parcelmaster
+            $grandTotal = $data->sum('total_price');
+
+            // Store parcelmaster data along with its details
+            $results[] = [
+                'parcelmaster' => $value,
+                'details' => $data,
+                'grand_total' => $grandTotal
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Parcel list retrieved successfully with details',
+            'status' => true,
+            'data' => $results
         ]);
     }
+
     public function changeParcelStatus($id)
     {
 

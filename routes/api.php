@@ -7,6 +7,7 @@ use App\Http\Controllers\API\TableController;
 use App\Http\Controllers\API\StaffController;
 use App\Http\Controllers\API\MenuController;
 use App\Http\Controllers\MobileController;
+use App\Models\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -56,6 +57,7 @@ Route::middleware('auth.member')->group(function () {
     Route::get('/parcelListDetail/{id}', [MobileController::class, 'parcelListDetail']);
     Route::get('/changeParcelStatus/{id}', [MobileController::class, 'changeParcelStatus']);
     Route::get('parcelCount', [MobileController::class, 'parcelCount']);
+    Route::get('/billCreate',[CategoryController::class, 'billCreate']);
 });
 Route::middleware('auth.restaurant')->group(function () {
 
@@ -105,6 +107,7 @@ Route::middleware('auth.restaurant')->group(function () {
     Route::delete('/menu/delete/{id?}', [MenuController::class, 'permanentDeleteMenu']);
     Route::get('/menu/byId/{id?}', [MenuController::class, 'showMenu']);
     Route::get('/trashMenu', [MenuController::class, 'getTrashMenus']);
+  
 });
 
 Route::get('/pass', [CategoryController::class, 'addPassword']);
