@@ -524,11 +524,17 @@ class MobileController extends Controller
     {
         $token = $request->header('token');
         $member = Member::where('token', $token)->first();
+
+        if (!$member) {
+            return response()->json(['error' => 'Member not found.'], 404);
+        }
+
         $restaurantId = $member->restaurantId;
 
         $data = ParcelMaster::where('restaurantId', $restaurantId)
             ->with(['parceldetail' => function ($query) {
-                $query->select('menuId', 'parcelmasterId', DB::raw('SUM(qty) as total_qty'));
+                $query->select('menuId', 'parcelmasterId', DB::raw('SUM(qty) as total_qty'))
+                    ->groupBy('menuId', 'parcelmasterId'); // Grouping by menuId and parcelmasterId
             }])
             ->get();
 
@@ -543,6 +549,7 @@ class MobileController extends Controller
 
         return Util::getResponse($data);
     }
+
 
     public function parcelListDetail($id)
     {

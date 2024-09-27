@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class parcelmaster extends Model
 {
     use HasFactory;
-    public function parceldetail()
+    public function parcelDetail()
     {
         return $this->hasMany(parceldetail::class, 'parcelmasterId');
     }
