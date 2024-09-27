@@ -10,6 +10,8 @@ use App\Models\Member;
 use App\Models\Menu;
 use App\Models\OrderDetail;
 use App\Models\OrderMaster;
+use App\Models\parceldetail;
+use App\Models\parcelmaster;
 use App\Models\Restaurant;
 use App\Models\Table;
 use App\Models\Waiting;
@@ -475,5 +477,112 @@ class MobileController extends Controller
 
         // Return the updated item in the response
         return Util::getResponse($targetWaiting, 'Sequence updated successfully');
+    }
+    public function parcel(Request $request)
+    {
+        // Get the token and find the associated member
+        $token = $request->header('token');
+        $member = Member::where('token', $token)->first();
+
+        if (!$member) {
+            return response()->json([
+                'message' => 'Invalid token or member not found',
+                'status' => false
+            ]);
+        }
+
+        $restaurantId = $member->restaurantId;
+
+        // Create and save a new parcel master record
+        $parcel = new ParcelMaster();
+        $parcel->restaurantId = $restaurantId;
+        $parcel->name = $request->name;
+        $parcel->contactNumber = $request->contactNumber;
+        $parcel->status = 'Pending';
+        $parcel->save();
+
+        $parcelDetails = $request->parcelDetails;
+
+        if (is_array($parcelDetails)) {
+            foreach ($parcelDetails as $detail) {
+                $parcelDetail = new ParcelDetail();
+                $parcelDetail->parcelmasterId = $parcel->id;
+                $parcelDetail->menuId = $detail['menuId'];
+                $parcelDetail->qty = $detail['qty'];
+                $parcelDetail->status = 'Pending';
+                $parcelDetail->save();
+            }
+        }
+
+        return response()->json([
+            'message' => 'Parcel Added Successfully with details',
+            'status' => true,
+            'data' => $parcel
+        ]);
+    }
+    public function parcelList(Request $request)
+    {
+        $token = $request->header('token');
+        $member = Member::where('token', $token)->first();
+        $restaurantId = $member->restaurantId;
+        $data =  ParcelMaster::where('restaurantId', $restaurantId)->get();
+        return Util::getResponse($data);
+    }
+    public function parcelListDetail($id)
+    {
+        $data = DB::table('menus')
+            ->crossJoin('parceldetail')
+            ->select('menus.*', 'parceldetail.*')
+            ->where('menus.id', '=', DB::raw('parceldetail.menuId'))
+            ->where('parceldetail.parcelmasterId', '=', $id)
+            ->get();
+        return Util::getResponse($data);
+    }
+    public function parcelData(Request $request)
+    {
+        $data = DB::table('parcelmasters')
+            ->crossJoin('parceldetail')
+            ->crossJoin('menus')
+            ->select('parcelmasters.name', 'parceldetail.qty', 'parceldetail.status as parceldetailStatus', 'parceldetail.id as paceldetailId', 'menus.*')
+            ->where('menus.id', '=', DB::raw('parceldetail.menuId'))
+            ->where('parcelmasters.id', '=', DB::raw('parceldetail.parcelmasterId'))
+            ->get();
+        return response()->json([
+            'message' => 'Parcel list Successfully with details',
+            'status' => true,
+            'data' => $data
+
+        ]);
+    }
+    public function changeParcelStatus($id)
+    {
+
+        $data = ParcelDetail::find($id);
+
+        $data->status = 'Done';
+        $data->save();
+
+        $findparcelMasterId = $data->parcelmasterId;
+        $contOrder = ParcelDetail::where('parcelmasterId', $findparcelMasterId)->count();
+        $findDataStauts  = ParcelDetail::where('parcelmasterId', $findparcelMasterId)->where('status', 'Done')->count();
+
+        if ($contOrder == $findDataStauts) {
+            $changeParcelStatus = ParcelMaster::find($findparcelMasterId);
+            $changeParcelStatus->status = 'Done';
+            $changeParcelStatus->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Status Changed Successfully',
+        ]);
+    }
+    public function parcelCount()
+    {
+        $count = ParcelMaster::count();
+        return response()->json([
+            'status' => true,
+            'data' => $count
+        ]);
     }
 }

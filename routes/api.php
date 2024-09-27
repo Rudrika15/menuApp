@@ -50,6 +50,12 @@ Route::middleware('auth.member')->group(function () {
     Route::get('/person', [MobileController::class, 'personList']);
     Route::delete('/person/{id?}', [MobileController::class, 'deletePerson']);
     Route::post('/changeSequence', [MobileController::class, 'changeSequence']);
+    Route::post('/addParcel', [MobileController::class, 'parcel']);
+    Route::get('/parcelList', [MobileController::class, 'parcelList']);
+    Route::get('/parcelData', [MobileController::class, 'parcelData']);
+    Route::get('/parcelListDetail/{id}', [MobileController::class, 'parcelListDetail']);
+    Route::get('/changeParcelStatus/{id}', [MobileController::class, 'changeParcelStatus']);
+    Route::get('parcelCount', [MobileController::class, 'parcelCount']);
 });
 Route::middleware('auth.restaurant')->group(function () {
 
