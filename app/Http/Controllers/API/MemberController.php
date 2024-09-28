@@ -103,8 +103,8 @@ class MemberController extends Controller
             $member['token'] = $member->token;
             return Util::loginResponse($member);
         } else {
-            $restaurant = Restaurant::where('email', request('email'))->first();
-            if (!$restaurant) {
+            $member = Restaurant::where('email', request('email'))->first();
+            if (!$member) {
                 return response()->json(['status' => false, 'message' => 'User not found'], 200);
             }
             if (!Hash::check($request->password, $member->password)) {
