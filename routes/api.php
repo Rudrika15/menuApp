@@ -28,7 +28,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 // Restaurant
-Route::post('/login', [RestaurantController::class, 'login']);
+Route::post('/login', [MemberController::class, 'staffLogin']);
 Route::post('/staffLogin', [MemberController::class, 'staffLogin']);
 Route::post('/restaurant/registration', [RestaurantController::class, 'restaurantRegistration']);
 
@@ -57,7 +57,7 @@ Route::middleware('auth.member')->group(function () {
     Route::get('/parcelListDetail/{id}', [MobileController::class, 'parcelListDetail']);
     Route::get('/changeParcelStatus/{id}', [MobileController::class, 'changeParcelStatus']);
     Route::get('parcelCount', [MobileController::class, 'parcelCount']);
-    Route::get('/billCreate',[CategoryController::class, 'billCreate']);
+    Route::get('/billCreate', [CategoryController::class, 'billCreate']);
 });
 Route::middleware('auth.restaurant')->group(function () {
 
@@ -107,7 +107,6 @@ Route::middleware('auth.restaurant')->group(function () {
     Route::delete('/menu/delete/{id?}', [MenuController::class, 'permanentDeleteMenu']);
     Route::get('/menu/byId/{id?}', [MenuController::class, 'showMenu']);
     Route::get('/trashMenu', [MenuController::class, 'getTrashMenus']);
-  
 });
 
 Route::get('/pass', [CategoryController::class, 'addPassword']);

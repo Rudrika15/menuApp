@@ -91,17 +91,32 @@ class MemberController extends Controller
         }
 
         $member = Member::where('email', $request->email)->first();
-        if (!$member) {
-            return response()->json(['status' => false, 'message' => 'User not found'], 200);
-        }
+        if ($member) {
 
-        if (!Hash::check($request->password, $member->password)) {
-            return response()->json(['status' => false, 'message' => 'Incorrect password'], 200);
-        }
+            if (!Hash::check($request->password, $member->password)) {
+                return response()->json(['status' => false, 'message' => 'Incorrect password'], 200);
+            }
 
-        $member->token = Util::generateToken();
-        $member->save();
-        return Util::getResponse($member);
+            $member->token = Util::generateToken();
+            $member->save();
+
+            $member['token'] = $member->token;
+            return Util::loginResponse($member);
+        } else {
+            $restaurant = Restaurant::where('email', request('email'))->first();
+            if (!$restaurant) {
+                return response()->json(['status' => false, 'message' => 'User not found'], 200);
+            }
+            if (!Hash::check($request->password, $member->password)) {
+                return response()->json(['status' => false, 'message' => 'Incorrect password'], 200);
+            }
+
+            $member->token = Util::generateToken();
+            $member->save();
+
+            $member['token'] = $member->token;
+            return Util::loginResponse($member);
+        }
     }
 
     public function editStaff(Request $request, $id)
